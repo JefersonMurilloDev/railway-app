@@ -7,7 +7,20 @@ import taskRoutes from './routes/tasks.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/taskmanager';
+
+// Construir URI de MongoDB
+// Prioridad: MONGODB_URI (Railway) > MONGO_URL + MONGO_DB_NAME (local con auth)
+const buildMongoUri = (): string => {
+    if (process.env.MONGODB_URI) {
+        return process.env.MONGODB_URI;
+    }
+
+    const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017';
+    const dbName = process.env.MONGO_DB_NAME || 'taskmanager';
+    return `${mongoUrl}/${dbName}`;
+};
+
+const MONGODB_URI = buildMongoUri();
 
 // Middlewares de seguridad y parsing
 app.use(helmet());

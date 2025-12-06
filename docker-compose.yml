@@ -1,14 +1,13 @@
 services:
-  mongodb:
-    image: mongo:7
+  mongo-db:
+    image: mongo:7.0
     container_name: taskmanager-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ${MONGO_USER:-MONGO_USER}
+      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASS:-MONGO_PASS}
+      MONGO_INITDB_DATABASE: ${MONGO_DB_NAME:-MONGO_DB_NAME}
+    volumes:
+      - ./mongo:/data/db
     ports:
       - "27017:27017"
-    volumes:
-      - mongodb_data:/data/db
-    environment:
-      - MONGO_INITDB_DATABASE=taskmanager
-    restart: unless-stopped
-
-volumes:
-  mongodb_data:
