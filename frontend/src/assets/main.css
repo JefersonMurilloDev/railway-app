@@ -1,0 +1,6 @@
+/* Limpiar estilos por defecto */
+@import './base.css';
+
+#app {
+    width: 100%;
+}
