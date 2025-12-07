@@ -1,44 +1,66 @@
 # Task Manager API 🚀
 
-API REST para gestión de tareas construida con Express, TypeScript y MongoDB.
+API REST para gestión de tareas construida con Express, TypeScript y MongoDB. Desplegada en Railway.
+
+## 🌐 URLs
+
+| Entorno | URL |
+|---------|-----|
+| **Producción** | https://railway-app-production-67fb.up.railway.app |
+| **Local** | http://localhost:3000 |
 
 ## Stack Tecnológico
 
-- **Runtime**: Node.js 18+
-- **Framework**: Express
-- **Lenguaje**: TypeScript
-- **Base de datos**: MongoDB
-- **Despliegue**: Railway
+- **Runtime:** Node.js 18+
+- **Framework:** Express
+- **Lenguaje:** TypeScript
+- **Base de datos:** MongoDB
+- **Despliegue:** Railway
 
 ## Desarrollo Local
 
 ### Requisitos
 - Node.js 18+
-- Docker (para MongoDB)
+- Docker Desktop
 
 ### Configuración
 
-1. **Clonar el repositorio**
+1. **Clonar e instalar**
 ```bash
-git clone <tu-repo>
+git clone https://github.com/JefersonMurilloDev/railway-app.git
 cd railway-app
 ```
 
-2. **Iniciar MongoDB con Docker**
+2. **Configurar variables de entorno**
+
+Crear `.env` en la raíz:
+```env
+MONGO_USER=tu_usuario
+MONGO_PASS=tu_password
+MONGO_DB_NAME=taskmanager
+```
+
+Crear `backend/.env`:
+```env
+PORT=3000
+MONGO_URL=mongodb://tu_usuario:tu_password@localhost:27017
+MONGO_DB_NAME=taskmanager?authSource=admin
+NODE_ENV=development
+```
+
+3. **Levantar MongoDB con Docker**
 ```bash
 docker-compose up -d
 ```
 
-3. **Instalar dependencias e iniciar el backend**
+4. **Iniciar el servidor**
 ```bash
 cd backend
 npm install
 npm run dev
 ```
 
-El servidor estará disponible en `http://localhost:3000`
-
-## Endpoints de la API
+## API Endpoints
 
 | Método | Ruta | Descripción |
 |--------|------|-------------|
@@ -54,22 +76,34 @@ El servidor estará disponible en `http://localhost:3000`
 
 ```json
 {
-  "title": "Mi primera tarea",
+  "title": "Mi tarea",
   "description": "Descripción opcional",
   "priority": "high",
   "completed": false
 }
 ```
 
-## Variables de Entorno
+**Prioridades válidas:** `low`, `medium`, `high`
 
-| Variable | Descripción | Default |
-|----------|-------------|---------|
-| `PORT` | Puerto del servidor | 3000 |
-| `MONGODB_URI` | URI de conexión a MongoDB | mongodb://localhost:27017/taskmanager |
+## Despliegue
 
-## Despliegue en Railway
+Cada push a `main` despliega automáticamente en Railway:
 
-1. Conecta tu repositorio de GitHub a Railway
-2. Agrega el plugin de MongoDB
-3. Railway detectará automáticamente la configuración y desplegará
+```bash
+git add .
+git commit -m "feat: nueva funcionalidad"
+git push
+```
+
+## Scripts
+
+| Script | Descripción |
+|--------|-------------|
+| `npm run dev` | Servidor de desarrollo con hot reload |
+| `npm run build` | Compilar TypeScript |
+| `npm start` | Iniciar servidor de producción |
+| `npm run lint` | Ejecutar ESLint |
+
+## Licencia
+
+MIT
