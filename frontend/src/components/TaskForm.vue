@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import type { Task } from '../services/api';
 
 const props = defineProps<{
@@ -14,21 +14,39 @@ const emit = defineEmits<{
 const title = ref(props.initialData?.title || '');
 const description = ref(props.initialData?.description || '');
 const priority = ref(props.initialData?.priority || 'medium');
+const dueDate = ref(props.initialData?.dueDate?.split('T')[0] || '');
+
+// Watch for changes when editing a task
+watch(() => props.initialData, (newData) => {
+  if (newData) {
+    title.value = newData.title;
+    description.value = newData.description || '';
+    priority.value = newData.priority;
+    dueDate.value = newData.dueDate?.split('T')[0] || '';
+  }
+});
 
 const handleSubmit = () => {
   emit('submit', {
     title: title.value,
     description: description.value,
     completed: props.initialData?.completed || false,
-    priority: priority.value
+    priority: priority.value,
+    dueDate: dueDate.value || undefined
   });
   
   if (!props.initialData) {
     title.value = '';
     description.value = '';
     priority.value = 'medium';
+    dueDate.value = '';
   }
 };
+
+// Get tomorrow's date for min attribute
+const tomorrow = new Date();
+tomorrow.setDate(tomorrow.getDate() + 1);
+const minDate = new Date().toISOString().split('T')[0];
 </script>
 
 <template>
@@ -52,8 +70,27 @@ const handleSubmit = () => {
       </div>
       
       <div class="form-side">
+        <!-- Due Date -->
+        <div class="date-group">
+          <label class="field-label">📅 Fecha límite</label>
+          <input 
+            type="date" 
+            v-model="dueDate" 
+            class="input input-date"
+            :min="minDate"
+          />
+          <button 
+            type="button" 
+            v-if="dueDate" 
+            @click="dueDate = ''" 
+            class="clear-date"
+            title="Quitar fecha"
+          >✕</button>
+        </div>
+
+        <!-- Priority -->
         <div class="priority-group">
-          <label class="priority-label">Prioridad</label>
+          <label class="field-label">Prioridad</label>
           <div class="priority-options">
             <label class="priority-option" :class="{ active: priority === 'low' }">
               <input type="radio" v-model="priority" value="low" />
@@ -119,21 +156,64 @@ const handleSubmit = () => {
   display: flex;
   flex-direction: column;
   gap: 16px;
-  min-width: 200px;
+  min-width: 220px;
 }
 
-.priority-group {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.priority-label {
+.field-label {
+  display: block;
   font-size: 0.85rem;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.05em;
+  margin-bottom: 8px;
+}
+
+/* Date Group */
+.date-group {
+  position: relative;
+}
+
+.input-date {
+  padding-right: 36px;
+  cursor: pointer;
+  color-scheme: dark;
+}
+
+.input-date::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  cursor: pointer;
+}
+
+.clear-date {
+  position: absolute;
+  right: 8px;
+  top: 50%;
+  transform: translateY(-50%);
+  margin-top: 12px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255,255,255,0.1);
+  border: none;
+  border-radius: 50%;
+  color: var(--text-muted);
+  font-size: 0.8rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.clear-date:hover {
+  background: var(--danger);
+  color: white;
+}
+
+/* Priority Group */
+.priority-group {
+  display: flex;
+  flex-direction: column;
 }
 
 .priority-options {
@@ -184,6 +264,7 @@ const handleSubmit = () => {
   display: flex;
   gap: 8px;
   justify-content: flex-end;
+  margin-top: 8px;
 }
 
 /* Responsive */

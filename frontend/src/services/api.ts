@@ -15,8 +15,10 @@ export interface Task {
     description?: string;
     completed: boolean;
     priority: 'low' | 'medium' | 'high';
+    dueDate?: string;
     createdAt?: string;
     updatedAt?: string;
 }
 
 export default api;
+

@@ -19,6 +19,31 @@ const priorityLabel = computed(() => {
   return map[props.task.priority];
 });
 
+// Due Date Logic
+const dueStatus = computed(() => {
+  if (!props.task.dueDate) return null;
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  
+  const due = new Date(props.task.dueDate);
+  due.setHours(0, 0, 0, 0);
+  
+  const diffTime = due.getTime() - today.getTime();
+  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  
+  if (diffDays < 0) return { label: 'Vencido', class: 'overdue', icon: '⚠️' };
+  if (diffDays === 0) return { label: 'Hoy', class: 'today', icon: '🔥' };
+  if (diffDays === 1) return { label: 'Mañana', class: 'soon', icon: '⏰' };
+  if (diffDays <= 3) return { label: `En ${diffDays} días`, class: 'soon', icon: '📅' };
+  
+  return { 
+    label: new Date(props.task.dueDate).toLocaleDateString('es-ES', { month: 'short', day: 'numeric' }), 
+    class: 'normal',
+    icon: '📅'
+  };
+});
+
 const formatDate = (dateString?: string) => {
   if (!dateString) return '';
   return new Date(dateString).toLocaleDateString('es-ES', {
@@ -58,7 +83,19 @@ const formatDate = (dateString?: string) => {
       </p>
       
       <div class="task-meta">
-        <span class="date" v-if="task.createdAt">📅 {{ formatDate(task.createdAt) }}</span>
+        <!-- Due Date Badge -->
+        <span 
+          v-if="dueStatus && !task.completed" 
+          class="due-badge" 
+          :class="dueStatus.class"
+        >
+          {{ dueStatus.icon }} {{ dueStatus.label }}
+        </span>
+        
+        <!-- Created Date (fallback if no due date) -->
+        <span class="created-date" v-if="!dueStatus && task.createdAt">
+          Creado: {{ formatDate(task.createdAt) }}
+        </span>
       </div>
     </div>
 
@@ -177,6 +214,54 @@ const formatDate = (dateString?: string) => {
 }
 
 .task-meta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+/* Due Date Badge */
+.due-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.due-badge.overdue {
+  background: rgba(239, 68, 68, 0.15);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  animation: pulse-danger 2s infinite;
+}
+
+.due-badge.today {
+  background: rgba(245, 158, 11, 0.15);
+  color: #fbbf24;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.due-badge.soon {
+  background: rgba(59, 130, 246, 0.15);
+  color: #60a5fa;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+}
+
+.due-badge.normal {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-muted);
+  border: 1px solid var(--glass-border);
+}
+
+@keyframes pulse-danger {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+
+.created-date {
   font-size: 0.8rem;
   color: var(--text-muted);
 }

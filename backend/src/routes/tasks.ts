@@ -30,8 +30,8 @@ router.get('/:id', async (req: Request, res: Response): Promise<void> => {
 // POST /api/tasks - Crear una nueva tarea
 router.post('/', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { title, description, priority } = req.body;
-        const task = new Task({ title, description, priority });
+        const { title, description, priority, dueDate } = req.body;
+        const task = new Task({ title, description, priority, dueDate });
         await task.save();
         res.status(201).json(task);
     } catch (error) {
@@ -46,10 +46,10 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 // PUT /api/tasks/:id - Actualizar una tarea
 router.put('/:id', async (req: Request, res: Response): Promise<void> => {
     try {
-        const { title, description, completed, priority } = req.body;
+        const { title, description, completed, priority, dueDate } = req.body;
         const task = await Task.findByIdAndUpdate(
             req.params.id,
-            { title, description, completed, priority },
+            { title, description, completed, priority, dueDate },
             { new: true, runValidators: true }
         );
         if (!task) {

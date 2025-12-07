@@ -5,6 +5,7 @@ export interface ITask extends Document {
     description?: string;
     completed: boolean;
     priority: 'low' | 'medium' | 'high';
+    dueDate?: Date;
     createdAt: Date;
     updatedAt: Date;
 }
@@ -31,6 +32,10 @@ const taskSchema = new Schema<ITask>(
             enum: ['low', 'medium', 'high'],
             default: 'medium',
         },
+        dueDate: {
+            type: Date,
+            default: null,
+        },
     },
     {
         timestamps: true,
@@ -39,6 +44,7 @@ const taskSchema = new Schema<ITask>(
 );
 
 // Índice para búsquedas frecuentes
-taskSchema.index({ completed: 1, createdAt: -1 });
+taskSchema.index({ completed: 1, dueDate: 1, createdAt: -1 });
 
 export const Task = mongoose.model<ITask>('Task', taskSchema);
+
