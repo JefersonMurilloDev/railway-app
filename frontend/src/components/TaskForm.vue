@@ -51,28 +51,30 @@ const minDate = new Date().toISOString().split('T')[0];
 
 <template>
   <form @submit.prevent="handleSubmit" class="task-form card">
-    <div class="form-grid">
-      <div class="form-main">
-        <input 
-          v-model="title" 
-          type="text" 
-          placeholder="¿Qué necesitas hacer hoy?" 
-          class="input input-title"
-          required
-          autofocus
-        />
-        <textarea 
-          v-model="description" 
-          placeholder="Añade detalles o notas..." 
-          class="input input-desc"
-          rows="2"
-        ></textarea>
-      </div>
-      
-      <div class="form-side">
-        <!-- Due Date -->
-        <div class="date-group">
-          <label class="field-label">📅 Fecha límite</label>
+    <!-- Main inputs -->
+    <div class="form-main">
+      <input 
+        v-model="title" 
+        type="text" 
+        placeholder="¿Qué necesitas hacer hoy?" 
+        class="input input-title"
+        required
+        autofocus
+      />
+      <textarea 
+        v-model="description" 
+        placeholder="Añade detalles o notas..." 
+        class="input input-desc"
+        rows="2"
+      ></textarea>
+    </div>
+    
+    <!-- Options Row -->
+    <div class="form-options">
+      <!-- Due Date -->
+      <div class="option-group date-group">
+        <label class="field-label">📅 Fecha</label>
+        <div class="date-input-wrapper">
           <input 
             type="date" 
             v-model="dueDate" 
@@ -87,58 +89,53 @@ const minDate = new Date().toISOString().split('T')[0];
             title="Quitar fecha"
           >✕</button>
         </div>
+      </div>
 
-        <!-- Priority -->
-        <div class="priority-group">
-          <label class="field-label">Prioridad</label>
-          <div class="priority-options">
-            <label class="priority-option" :class="{ active: priority === 'low' }">
-              <input type="radio" v-model="priority" value="low" />
-              <span class="dot low"></span>
-              <span>Baja</span>
-            </label>
-            <label class="priority-option" :class="{ active: priority === 'medium' }">
-              <input type="radio" v-model="priority" value="medium" />
-              <span class="dot medium"></span>
-              <span>Media</span>
-            </label>
-            <label class="priority-option" :class="{ active: priority === 'high' }">
-              <input type="radio" v-model="priority" value="high" />
-              <span class="dot high"></span>
-              <span>Alta</span>
-            </label>
-          </div>
-        </div>
-        
-        <div class="form-actions">
-          <button type="button" v-if="initialData" @click="$emit('cancel')" class="btn btn-text">
-            Cancelar
-          </button>
-          <button type="submit" class="btn btn-primary">
-            {{ initialData ? 'Guardar' : '+ Crear Tarea' }}
-          </button>
+      <!-- Priority -->
+      <div class="option-group priority-group">
+        <label class="field-label">Prioridad</label>
+        <div class="priority-options">
+          <label class="priority-option" :class="{ active: priority === 'low' }">
+            <input type="radio" v-model="priority" value="low" />
+            <span class="dot low"></span>
+            <span class="priority-text">Baja</span>
+          </label>
+          <label class="priority-option" :class="{ active: priority === 'medium' }">
+            <input type="radio" v-model="priority" value="medium" />
+            <span class="dot medium"></span>
+            <span class="priority-text">Media</span>
+          </label>
+          <label class="priority-option" :class="{ active: priority === 'high' }">
+            <input type="radio" v-model="priority" value="high" />
+            <span class="dot high"></span>
+            <span class="priority-text">Alta</span>
+          </label>
         </div>
       </div>
+    </div>
+    
+    <!-- Actions -->
+    <div class="form-actions">
+      <button type="button" v-if="initialData" @click="$emit('cancel')" class="btn btn-text">
+        Cancelar
+      </button>
+      <button type="submit" class="btn btn-primary">
+        {{ initialData ? 'Guardar' : '+ Crear Tarea' }}
+      </button>
     </div>
   </form>
 </template>
 
 <style scoped>
 .task-form {
-  margin-bottom: 32px;
-}
-
-.form-grid {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  gap: 24px;
-  align-items: start;
+  padding: 20px 24px;
 }
 
 .form-main {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin-bottom: 16px;
 }
 
 .input-title {
@@ -152,16 +149,22 @@ const minDate = new Date().toISOString().split('T')[0];
   font-size: 0.95rem;
 }
 
-.form-side {
+/* Options Row - Horizontal layout */
+.form-options {
   display: flex;
-  flex-direction: column;
   gap: 16px;
-  min-width: 220px;
+  margin-bottom: 16px;
+  flex-wrap: wrap;
+}
+
+.option-group {
+  flex: 1;
+  min-width: 140px;
 }
 
 .field-label {
   display: block;
-  font-size: 0.85rem;
+  font-size: 0.75rem;
   font-weight: 600;
   color: var(--text-secondary);
   text-transform: uppercase;
@@ -171,13 +174,19 @@ const minDate = new Date().toISOString().split('T')[0];
 
 /* Date Group */
 .date-group {
+  flex: 0 0 auto;
+}
+
+.date-input-wrapper {
   position: relative;
+  display: inline-block;
 }
 
 .input-date {
   padding-right: 36px;
   cursor: pointer;
   color-scheme: dark;
+  min-width: 150px;
 }
 
 .input-date::-webkit-calendar-picker-indicator {
@@ -190,9 +199,8 @@ const minDate = new Date().toISOString().split('T')[0];
   right: 8px;
   top: 50%;
   transform: translateY(-50%);
-  margin-top: 12px;
-  width: 24px;
-  height: 24px;
+  width: 20px;
+  height: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -200,7 +208,7 @@ const minDate = new Date().toISOString().split('T')[0];
   border: none;
   border-radius: 50%;
   color: var(--text-muted);
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   cursor: pointer;
   transition: var(--transition);
 }
@@ -212,26 +220,25 @@ const minDate = new Date().toISOString().split('T')[0];
 
 /* Priority Group */
 .priority-group {
-  display: flex;
-  flex-direction: column;
+  flex: 1;
 }
 
 .priority-options {
   display: flex;
-  gap: 8px;
+  gap: 6px;
 }
 
 .priority-option {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 8px 12px;
+  gap: 4px;
+  padding: 8px 10px;
   background: rgba(0, 0, 0, 0.2);
   border: 1px solid var(--glass-border);
   border-radius: var(--radius-sm);
   cursor: pointer;
   transition: var(--transition);
-  font-size: 0.85rem;
+  font-size: 0.8rem;
   color: var(--text-secondary);
 }
 
@@ -254,6 +261,7 @@ const minDate = new Date().toISOString().split('T')[0];
   width: 8px;
   height: 8px;
   border-radius: 50%;
+  flex-shrink: 0;
 }
 
 .dot.low { background: var(--success); }
@@ -264,21 +272,39 @@ const minDate = new Date().toISOString().split('T')[0];
   display: flex;
   gap: 8px;
   justify-content: flex-end;
-  margin-top: 8px;
 }
 
 /* Responsive */
-@media (max-width: 768px) {
-  .form-grid {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .form-options {
+    flex-direction: column;
+    gap: 12px;
   }
   
-  .form-side {
+  .option-group {
     min-width: unset;
   }
   
+  .date-group {
+    flex: 1;
+  }
+  
+  .input-date {
+    width: 100%;
+  }
+  
   .priority-options {
-    flex-wrap: wrap;
+    justify-content: space-between;
+  }
+  
+  .priority-option {
+    flex: 1;
+    justify-content: center;
+    padding: 10px 8px;
+  }
+  
+  .priority-text {
+    display: none;
   }
   
   .form-actions {
@@ -290,3 +316,4 @@ const minDate = new Date().toISOString().split('T')[0];
   }
 }
 </style>
+
