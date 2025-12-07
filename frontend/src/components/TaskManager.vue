@@ -7,9 +7,22 @@ import TaskItem from './TaskItem.vue';
 const tasks = ref<Task[]>([]);
 const loading = ref(true);
 const editingTask = ref<Task | null>(null);
+const filter = ref<'all' | 'pending' | 'completed'>('all');
 
 const completedCount = computed(() => tasks.value.filter(t => t.completed).length);
 const pendingCount = computed(() => tasks.value.filter(t => !t.completed).length);
+
+// Filtered tasks based on selected filter
+const filteredTasks = computed(() => {
+  switch (filter.value) {
+    case 'pending':
+      return tasks.value.filter(t => !t.completed);
+    case 'completed':
+      return tasks.value.filter(t => t.completed);
+    default:
+      return tasks.value;
+  }
+});
 
 const fetchTasks = async () => {
   try {
@@ -98,6 +111,31 @@ onMounted(fetchTasks);
         @cancel="editingTask = null"
       />
 
+      <!-- Filter Tabs -->
+      <div class="filter-tabs" v-if="!loading && tasks.length > 0">
+        <button 
+          class="filter-tab" 
+          :class="{ active: filter === 'all' }"
+          @click="filter = 'all'"
+        >
+          Todas <span class="count">{{ tasks.length }}</span>
+        </button>
+        <button 
+          class="filter-tab" 
+          :class="{ active: filter === 'pending' }"
+          @click="filter = 'pending'"
+        >
+          Pendientes <span class="count">{{ pendingCount }}</span>
+        </button>
+        <button 
+          class="filter-tab" 
+          :class="{ active: filter === 'completed' }"
+          @click="filter = 'completed'"
+        >
+          Completadas <span class="count">{{ completedCount }}</span>
+        </button>
+      </div>
+
       <!-- Loading -->
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
@@ -113,10 +151,17 @@ onMounted(fetchTasks);
           <p>Crea tu primera tarea para comenzar a ser productivo</p>
         </div>
 
+        <!-- Empty Filter State -->
+        <div v-else-if="filteredTasks.length === 0" class="empty-state card">
+          <div class="empty-icon">🔍</div>
+          <h3>Sin resultados</h3>
+          <p>No hay tareas {{ filter === 'pending' ? 'pendientes' : 'completadas' }}</p>
+        </div>
+
         <!-- Tasks -->
         <transition-group name="task" tag="div">
           <TaskItem 
-            v-for="task in tasks" 
+            v-for="task in filteredTasks" 
             :key="task._id" 
             :task="task"
             @toggle="handleToggle"
@@ -178,6 +223,56 @@ onMounted(fetchTasks);
   letter-spacing: 0.05em;
 }
 
+/* Filter Tabs */
+.filter-tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background: var(--glass-bg);
+  border-radius: var(--radius-md);
+  border: 1px solid var(--glass-border);
+}
+
+.filter-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.filter-tab:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-primary);
+}
+
+.filter-tab.active {
+  background: var(--primary);
+  color: white;
+}
+
+.filter-tab .count {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 2px 8px;
+  border-radius: 100px;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.filter-tab.active .count {
+  background: rgba(255, 255, 255, 0.3);
+}
+
 /* Empty State */
 .empty-state {
   text-align: center;
@@ -232,17 +327,17 @@ footer {
 .task-move,
 .task-enter-active,
 .task-leave-active {
-  transition: all 0.4s ease;
+  transition: all 0.15s ease;
 }
 
 .task-enter-from {
   opacity: 0;
-  transform: translateY(-20px);
+  transform: translateY(-10px);
 }
 
 .task-leave-to {
   opacity: 0;
-  transform: translateX(30px);
+  transform: translateX(20px);
 }
 
 .task-leave-active {
@@ -263,6 +358,10 @@ footer {
   
   .stat-value {
     font-size: 1.5rem;
+  }
+  
+  .filter-tabs {
+    flex-direction: column;
   }
   
   .empty-state {
