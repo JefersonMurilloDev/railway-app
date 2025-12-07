@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import api, { type Task } from '../services/api';
 import TaskForm from './TaskForm.vue';
 import TaskItem from './TaskItem.vue';
@@ -7,6 +7,9 @@ import TaskItem from './TaskItem.vue';
 const tasks = ref<Task[]>([]);
 const loading = ref(true);
 const editingTask = ref<Task | null>(null);
+
+const completedCount = computed(() => tasks.value.filter(t => t.completed).length);
+const pendingCount = computed(() => tasks.value.filter(t => !t.completed).length);
 
 const fetchTasks = async () => {
   try {
@@ -35,7 +38,7 @@ const handleUpdate = async (taskData: any) => {
     const { data } = await api.put(`/tasks/${editingTask.value._id}`, taskData);
     const index = tasks.value.findIndex(t => t._id === data._id);
     if (index !== -1) tasks.value[index] = data;
-    editingTask.value = null; // Close edit mode
+    editingTask.value = null;
   } catch (error) {
     console.error('Error updating task', error);
   }
@@ -52,7 +55,7 @@ const handleToggle = async (task: Task) => {
 };
 
 const handleDelete = async (id: string) => {
-  if (!confirm('¿Estás seguro de eliminar esta tarea?')) return;
+  if (!confirm('¿Eliminar esta tarea?')) return;
   try {
     await api.delete(`/tasks/${id}`);
     tasks.value = tasks.value.filter(t => t._id !== id);
@@ -65,85 +68,209 @@ onMounted(fetchTasks);
 </script>
 
 <template>
-  <div class="task-manager container">
-    <header>
-      <h1>Mis Tareas</h1>
-      <p style="color: var(--color-text-muted)">Organiza tu día de forma productiva</p>
-    </header>
+  <div class="app-wrapper">
+    <div class="container">
+      <header>
+        <h1>TaskFlow</h1>
+        <p>Organiza tu día, conquista tus metas</p>
+      </header>
 
-    <TaskForm 
-      :initial-data="editingTask" 
-      @submit="editingTask ? handleUpdate($event) : handleCreate($event)"
-      @cancel="editingTask = null"
-    />
-
-    <div v-if="loading" class="loading">
-      Cargando tareas...
-    </div>
-
-    <div v-else class="task-list">
-      <div v-if="tasks.length === 0" class="empty-state">
-        <span class="emoji">📝</span>
-        <h3>No hay tareas aún</h3>
-        <p>Agrega tu primera tarea arriba para empezar</p>
+      <!-- Stats -->
+      <div class="stats" v-if="!loading && tasks.length > 0">
+        <div class="stat">
+          <span class="stat-value">{{ pendingCount }}</span>
+          <span class="stat-label">Pendientes</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ completedCount }}</span>
+          <span class="stat-label">Completadas</span>
+        </div>
+        <div class="stat">
+          <span class="stat-value">{{ tasks.length }}</span>
+          <span class="stat-label">Total</span>
+        </div>
       </div>
 
-      <transition-group name="list">
-        <TaskItem 
-          v-for="task in tasks" 
-          :key="task._id" 
-          :task="task"
-          @toggle="handleToggle"
-          @edit="editingTask = task"
-          @delete="handleDelete"
-        />
-      </transition-group>
+      <!-- Form -->
+      <TaskForm 
+        :initial-data="editingTask" 
+        @submit="editingTask ? handleUpdate($event) : handleCreate($event)"
+        @cancel="editingTask = null"
+      />
+
+      <!-- Loading -->
+      <div v-if="loading" class="loading">
+        <div class="spinner"></div>
+        <p>Cargando tareas...</p>
+      </div>
+
+      <!-- Task List -->
+      <div v-else class="task-list">
+        <!-- Empty State -->
+        <div v-if="tasks.length === 0" class="empty-state card">
+          <div class="empty-icon">📋</div>
+          <h3>Tu lista está vacía</h3>
+          <p>Crea tu primera tarea para comenzar a ser productivo</p>
+        </div>
+
+        <!-- Tasks -->
+        <transition-group name="task" tag="div">
+          <TaskItem 
+            v-for="task in tasks" 
+            :key="task._id" 
+            :task="task"
+            @toggle="handleToggle"
+            @edit="editingTask = task"
+            @delete="handleDelete"
+          />
+        </transition-group>
+      </div>
     </div>
+    
+    <!-- Footer -->
+    <footer>
+      <p>TaskFlow — Hecho con 💜</p>
+    </footer>
   </div>
 </template>
 
 <style scoped>
-.task-manager {
-  max-width: 800px;
-  padding-bottom: 4rem;
+.app-wrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
+.container {
+  flex: 1;
+  padding-bottom: 40px;
+}
+
+/* Stats */
+.stats {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 32px;
+  justify-content: center;
+}
+
+.stat {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  min-width: 100px;
+}
+
+.stat-value {
+  font-size: 2rem;
+  font-weight: 700;
+  color: var(--primary-light);
+}
+
+.stat-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Empty State */
 .empty-state {
   text-align: center;
-  padding: 4rem 2rem;
-  background: var(--color-bg-card);
-  border-radius: var(--radius-md);
-  border: 1px dashed rgba(255, 255, 255, 0.1);
-  color: var(--color-text-muted);
+  padding: 60px 24px;
 }
 
-.empty-state .emoji {
-  font-size: 3rem;
-  display: block;
-  margin-bottom: 1rem;
+.empty-icon {
+  font-size: 4rem;
+  margin-bottom: 16px;
 }
 
+.empty-state h3 {
+  font-size: 1.25rem;
+  margin-bottom: 8px;
+  color: var(--text-primary);
+}
+
+.empty-state p {
+  color: var(--text-muted);
+}
+
+/* Loading */
 .loading {
   text-align: center;
-  padding: 2rem;
-  color: var(--color-text-muted);
+  padding: 60px 24px;
+  color: var(--text-muted);
 }
 
-/* Animations */
-.list-move,
-.list-enter-active,
-.list-leave-active {
-  transition: all 0.5s ease;
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid var(--glass-border);
+  border-top-color: var(--primary);
+  border-radius: 50%;
+  margin: 0 auto 16px;
+  animation: spin 1s linear infinite;
 }
 
-.list-enter-from,
-.list-leave-to {
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Footer */
+footer {
+  text-align: center;
+  padding: 24px;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+
+/* Transitions */
+.task-move,
+.task-enter-active,
+.task-leave-active {
+  transition: all 0.4s ease;
+}
+
+.task-enter-from {
+  opacity: 0;
+  transform: translateY(-20px);
+}
+
+.task-leave-to {
   opacity: 0;
   transform: translateX(30px);
 }
 
-.list-leave-active {
+.task-leave-active {
   position: absolute;
-  width: 100%; /* Important for smooth removal */
+  width: calc(100% - 48px);
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .stats {
+    gap: 8px;
+  }
+  
+  .stat {
+    padding: 12px 16px;
+    min-width: 80px;
+  }
+  
+  .stat-value {
+    font-size: 1.5rem;
+  }
+  
+  .empty-state {
+    padding: 40px 16px;
+  }
+  
+  .empty-icon {
+    font-size: 3rem;
+  }
 }
 </style>

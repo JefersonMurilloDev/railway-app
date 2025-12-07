@@ -6,15 +6,13 @@ const props = defineProps<{
   task: Task;
 }>();
 
-const emit = defineEmits<{
+defineEmits<{
   (e: 'toggle', task: Task): void;
   (e: 'delete', id: string): void;
   (e: 'edit', task: Task): void;
 }>();
 
-const priorityClass = computed(() => {
-  return `badge-${props.task.priority}`;
-});
+const priorityClass = computed(() => `badge-${props.task.priority}`);
 
 const priorityLabel = computed(() => {
   const map = { low: 'Baja', medium: 'Media', high: 'Alta' };
@@ -24,47 +22,57 @@ const priorityLabel = computed(() => {
 const formatDate = (dateString?: string) => {
   if (!dateString) return '';
   return new Date(dateString).toLocaleDateString('es-ES', {
-    month: 'short', day: 'numeric'
+    month: 'short', 
+    day: 'numeric'
   });
 };
 </script>
 
 <template>
   <div class="task-item card" :class="{ completed: task.completed }">
+    <div class="task-left">
+      <label class="checkbox">
+        <input 
+          type="checkbox" 
+          :checked="task.completed" 
+          @change="$emit('toggle', task)"
+        />
+        <span class="checkbox-visual">
+          <svg viewBox="0 0 12 10" fill="none">
+            <path d="M1 5L4.5 8.5L11 1" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </span>
+      </label>
+    </div>
+    
     <div class="task-content">
       <div class="task-header">
-        <label class="checkbox-wrapper">
-          <input 
-            type="checkbox" 
-            :checked="task.completed" 
-            @change="$emit('toggle', task)"
-          />
-          <span class="checkmark"></span>
-        </label>
-        
-        <div class="title-section">
-          <h3 class="task-title" :class="{ 'text-strike': task.completed }">
-            {{ task.title }}
-          </h3>
-          <span class="badge" :class="priorityClass">{{ priorityLabel }}</span>
-        </div>
+        <h3 class="task-title" :class="{ 'is-done': task.completed }">
+          {{ task.title }}
+        </h3>
+        <span class="badge" :class="priorityClass">{{ priorityLabel }}</span>
       </div>
       
       <p v-if="task.description" class="task-desc">
         {{ task.description }}
       </p>
       
-      <div class="task-meta" v-if="task.createdAt">
-        <span class="date">{{ formatDate(task.createdAt) }}</span>
+      <div class="task-meta">
+        <span class="date" v-if="task.createdAt">📅 {{ formatDate(task.createdAt) }}</span>
       </div>
     </div>
 
     <div class="task-actions">
-      <button @click="$emit('edit', task)" class="btn-icon" title="Editar">
-        ✏️
+      <button @click="$emit('edit', task)" class="action-btn" title="Editar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+          <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+        </svg>
       </button>
-      <button @click="$emit('delete', task._id!)" class="btn-icon delete" title="Eliminar">
-        🗑️
+      <button @click="$emit('delete', task._id!)" class="action-btn delete" title="Eliminar">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+        </svg>
       </button>
     </div>
   </div>
@@ -73,168 +81,165 @@ const formatDate = (dateString?: string) => {
 <style scoped>
 .task-item {
   display: flex;
-  justify-content: space-between;
   align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 1rem;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 16px;
+  padding: 20px;
+  margin-bottom: 12px;
+  transition: var(--transition);
 }
 
 .task-item.completed {
-  opacity: 0.7;
-  background-color: rgba(30, 41, 59, 0.5);
+  opacity: 0.6;
 }
 
-.task-content {
-  flex: 1;
+.task-item.completed:hover {
+  opacity: 0.8;
 }
 
-.task-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-
-.checkbox-wrapper {
-  position: relative;
-  display: inline-block;
-  width: 24px;
-  height: 24px;
-  cursor: pointer;
+/* Checkbox */
+.task-left {
   flex-shrink: 0;
-  margin-top: 2px;
+  padding-top: 2px;
 }
 
-.checkbox-wrapper input {
+.checkbox {
+  display: block;
+  position: relative;
+  cursor: pointer;
+}
+
+.checkbox input {
+  position: absolute;
   opacity: 0;
   width: 0;
   height: 0;
 }
 
-.checkmark {
-  position: absolute;
-  top: 0;
-  left: 0;
-  height: 24px;
-  width: 24px;
-  background-color: rgba(255, 255, 255, 0.1);
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 6px;
-  transition: var(--transition);
-}
-
-.checkbox-wrapper:hover .checkmark {
-  background-color: rgba(255, 255, 255, 0.2);
-}
-
-.checkbox-wrapper input:checked ~ .checkmark {
-  background-color: var(--color-success);
-  border-color: var(--color-success);
-}
-
-.checkmark:after {
-  content: "";
-  position: absolute;
-  display: none;
-}
-
-.checkbox-wrapper input:checked ~ .checkmark:after {
-  display: block;
-}
-
-.checkbox-wrapper .checkmark:after {
-  left: 8px;
-  top: 4px;
-  width: 5px;
-  height: 10px;
-  border: solid white;
-  border-width: 0 2px 2px 0;
-  transform: rotate(45deg);
-}
-
-.title-section {
+.checkbox-visual {
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  gap: 0.75rem;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 2px solid rgba(255, 255, 255, 0.25);
+  border-radius: 50%;
+  transition: var(--transition);
+  color: transparent;
+}
+
+.checkbox-visual svg {
+  width: 12px;
+  height: 12px;
+}
+
+.checkbox:hover .checkbox-visual {
+  border-color: var(--primary);
+  background: rgba(139, 92, 246, 0.1);
+}
+
+.checkbox input:checked + .checkbox-visual {
+  background: var(--success);
+  border-color: var(--success);
+  color: white;
+}
+
+/* Content */
+.task-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.task-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 4px;
 }
 
 .task-title {
-  font-size: 1.125rem;
+  font-size: 1rem;
   font-weight: 600;
+  color: var(--text-primary);
   margin: 0;
 }
 
-.text-strike {
+.task-title.is-done {
   text-decoration: line-through;
-  color: var(--color-text-muted);
+  color: var(--text-muted);
 }
 
 .task-desc {
-  color: var(--color-text-muted);
-  font-size: 0.95rem;
-  margin-left: 2.5rem; /* Align with title */
-  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+  margin: 8px 0;
   line-height: 1.5;
 }
 
 .task-meta {
-  margin-left: 2.5rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.3);
+  color: var(--text-muted);
 }
 
+/* Actions */
 .task-actions {
   display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  gap: 8px;
   opacity: 0;
-  transform: translateX(10px);
   transition: var(--transition);
 }
 
 .task-item:hover .task-actions {
   opacity: 1;
-  transform: translateX(0);
 }
 
-.btn-icon {
-  width: 36px;
-  height: 36px;
+.action-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: 8px;
-  background-color: rgba(255, 255, 255, 0.05);
-  font-size: 1.1rem;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-secondary);
+  border: none;
+  cursor: pointer;
   transition: var(--transition);
 }
 
-.btn-icon:hover {
-  background-color: var(--color-primary);
+.action-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.action-btn:hover {
+  background: var(--primary);
   color: white;
 }
 
-.btn-icon.delete:hover {
-  background-color: var(--color-danger);
+.action-btn.delete:hover {
+  background: var(--danger);
 }
 
+/* Responsive */
 @media (max-width: 640px) {
-  .task-actions {
-    opacity: 1; /* Always visible on mobile */
-    transform: none;
-    flex-direction: row;
+  .task-item {
+    padding: 16px;
   }
   
-  .task-item {
+  .task-actions {
+    opacity: 1;
     flex-direction: column;
   }
   
-  .task-actions {
-    width: 100%;
-    justify-content: flex-end;
-    margin-top: 0.5rem;
+  .action-btn {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .action-btn svg {
+    width: 16px;
+    height: 16px;
   }
 }
 </style>

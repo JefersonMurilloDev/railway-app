@@ -23,7 +23,6 @@ const handleSubmit = () => {
     priority: priority.value
   });
   
-  // Reset fields if adding new
   if (!props.initialData) {
     title.value = '';
     description.value = '';
@@ -34,43 +33,54 @@ const handleSubmit = () => {
 
 <template>
   <form @submit.prevent="handleSubmit" class="task-form card">
-    <div class="form-group">
-      <input 
-        v-model="title" 
-        type="text" 
-        placeholder="¿Qué hay que hacer?" 
-        class="input"
-        required
-        autofocus
-      />
-    </div>
-    
-    <div class="form-group">
-      <textarea 
-        v-model="description" 
-        placeholder="Descripción (opcional)" 
-        class="input textarea"
-        rows="2"
-      ></textarea>
-    </div>
-
-    <div class="form-actions">
-      <div class="priority-selector">
-        <label>Prioridad:</label>
-        <select v-model="priority" class="input select">
-          <option value="low">Baja</option>
-          <option value="medium">Media</option>
-          <option value="high">Alta</option>
-        </select>
+    <div class="form-grid">
+      <div class="form-main">
+        <input 
+          v-model="title" 
+          type="text" 
+          placeholder="¿Qué necesitas hacer hoy?" 
+          class="input input-title"
+          required
+          autofocus
+        />
+        <textarea 
+          v-model="description" 
+          placeholder="Añade detalles o notas..." 
+          class="input input-desc"
+          rows="2"
+        ></textarea>
       </div>
-
-      <div class="buttons">
-        <button type="button" v-if="initialData" @click="$emit('cancel')" class="btn btn-text">
-          Cancelar
-        </button>
-        <button type="submit" class="btn btn-primary">
-          {{ initialData ? 'Guardar Cambios' : 'Agregar Tarea' }}
-        </button>
+      
+      <div class="form-side">
+        <div class="priority-group">
+          <label class="priority-label">Prioridad</label>
+          <div class="priority-options">
+            <label class="priority-option" :class="{ active: priority === 'low' }">
+              <input type="radio" v-model="priority" value="low" />
+              <span class="dot low"></span>
+              <span>Baja</span>
+            </label>
+            <label class="priority-option" :class="{ active: priority === 'medium' }">
+              <input type="radio" v-model="priority" value="medium" />
+              <span class="dot medium"></span>
+              <span>Media</span>
+            </label>
+            <label class="priority-option" :class="{ active: priority === 'high' }">
+              <input type="radio" v-model="priority" value="high" />
+              <span class="dot high"></span>
+              <span>Alta</span>
+            </label>
+          </div>
+        </div>
+        
+        <div class="form-actions">
+          <button type="button" v-if="initialData" @click="$emit('cancel')" class="btn btn-text">
+            Cancelar
+          </button>
+          <button type="submit" class="btn btn-primary">
+            {{ initialData ? 'Guardar' : '+ Crear Tarea' }}
+          </button>
+        </div>
       </div>
     </div>
   </form>
@@ -78,57 +88,124 @@ const handleSubmit = () => {
 
 <style scoped>
 .task-form {
-  margin-bottom: 2rem;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+  margin-bottom: 32px;
 }
 
-.form-group {
-  margin-bottom: 1rem;
+.form-grid {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 24px;
+  align-items: start;
 }
 
-.textarea {
+.form-main {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.input-title {
+  font-size: 1.1rem;
+  font-weight: 500;
+}
+
+.input-desc {
   resize: vertical;
-  min-height: 80px;
+  min-height: 60px;
+  font-size: 0.95rem;
 }
+
+.form-side {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 200px;
+}
+
+.priority-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.priority-label {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.priority-options {
+  display: flex;
+  gap: 8px;
+}
+
+.priority-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(0, 0, 0, 0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: var(--transition);
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+}
+
+.priority-option input {
+  display: none;
+}
+
+.priority-option:hover {
+  background: rgba(0, 0, 0, 0.3);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+.priority-option.active {
+  background: rgba(139, 92, 246, 0.15);
+  border-color: var(--primary);
+  color: var(--text-primary);
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+}
+
+.dot.low { background: var(--success); }
+.dot.medium { background: var(--warning); }
+.dot.high { background: var(--danger); }
 
 .form-actions {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 1rem;
-  margin-top: 1rem;
-  padding-top: 1rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
+  gap: 8px;
+  justify-content: flex-end;
 }
 
-.priority-selector {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--color-text-muted);
-}
-
-.select {
-  padding: 0.5rem;
-  width: auto;
-  background-color: rgba(0, 0, 0, 0.2);
-}
-
-.buttons {
-  display: flex;
-  gap: 0.5rem;
-}
-
-@media (max-width: 640px) {
-  .form-actions {
-    flex-direction: column;
-    align-items: stretch;
+/* Responsive */
+@media (max-width: 768px) {
+  .form-grid {
+    grid-template-columns: 1fr;
   }
   
-  .buttons {
-    justify-content: flex-end;
+  .form-side {
+    min-width: unset;
+  }
+  
+  .priority-options {
+    flex-wrap: wrap;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions .btn {
+    width: 100%;
   }
 }
 </style>
