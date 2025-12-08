@@ -2,32 +2,25 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
-import mongoose from 'mongoose';
+
+// Config & Utils
+import connectDB from './config/database.js';
+import errorHandler from './middleware/errorHandler.js';
+import { generalLimiter } from './middleware/rateLimiter.js';
+
+// Routes
 import taskRoutes from './routes/tasks.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Construir URI de MongoDB
-// Prioridad: MONGODB_URI (Railway) > MONGO_URL + MONGO_DB_NAME (local con auth)
-const buildMongoUri = (): string => {
-    if (process.env.MONGODB_URI) {
-        return process.env.MONGODB_URI;
-    }
-
-    const mongoUrl = process.env.MONGO_URL || 'mongodb://localhost:27017';
-    const dbName = process.env.MONGO_DB_NAME || 'taskmanager';
-    return `${mongoUrl}/${dbName}`;
-};
-
-const MONGODB_URI = buildMongoUri();
-
 // Middlewares de seguridad y parsing
 app.use(helmet());
 app.use(cors());
 app.use(express.json());
+app.use(generalLimiter); // Rate limiting global
 
-// Rutas
+// Rutas API
 app.use('/api/tasks', taskRoutes);
 
 // Health check para Railway
@@ -47,19 +40,16 @@ app.get('/', (_req, res) => {
     });
 });
 
-// Conexión a MongoDB e inicio del servidor
-async function startServer() {
-    try {
-        await mongoose.connect(MONGODB_URI);
-        console.log('✅ Conectado a MongoDB');
+// Middleware de manejo de errores (debe ir al final)
+app.use(errorHandler);
 
-        app.listen(PORT, () => {
-            console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
-        });
-    } catch (error) {
-        console.error('❌ Error al conectar a MongoDB:', error);
-        process.exit(1);
-    }
-}
+// Iniciar servidor
+const startServer = async () => {
+    await connectDB();
+
+    app.listen(PORT, () => {
+        console.log(`🚀 Servidor corriendo en http://localhost:${PORT}`);
+    });
+};
 
 startServer();

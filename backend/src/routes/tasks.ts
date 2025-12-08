@@ -1,99 +1,34 @@
-import { Router, Request, Response } from 'express';
-import { Task } from '../models/Task.js';
+import { Router } from 'express';
+import asyncHandler from '../utils/asyncHandler.js';
+import { validateCreateTask, validateUpdateTask, validateTaskId } from '../middleware/validators.js';
+import { createLimiter } from '../middleware/rateLimiter.js';
+import {
+    getTasks,
+    getTaskById,
+    createTask,
+    updateTask,
+    deleteTask,
+    toggleTask
+} from '../controllers/taskController.js';
 
 const router = Router();
 
 // GET /api/tasks - Obtener todas las tareas
-router.get('/', async (_req: Request, res: Response): Promise<void> => {
-    try {
-        const tasks = await Task.find().sort({ createdAt: -1 });
-        res.json(tasks);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener las tareas' });
-    }
-});
+router.get('/', asyncHandler(getTasks));
 
 // GET /api/tasks/:id - Obtener una tarea por ID
-router.get('/:id', async (req: Request, res: Response): Promise<void> => {
-    try {
-        const task = await Task.findById(req.params.id);
-        if (!task) {
-            res.status(404).json({ error: 'Tarea no encontrada' });
-            return;
-        }
-        res.json(task);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al obtener la tarea' });
-    }
-});
+router.get('/:id', validateTaskId, asyncHandler(getTaskById));
 
 // POST /api/tasks - Crear una nueva tarea
-router.post('/', async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { title, description, priority, dueDate } = req.body;
-        const task = new Task({ title, description, priority, dueDate });
-        await task.save();
-        res.status(201).json(task);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(400).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: 'Error al crear la tarea' });
-        }
-    }
-});
+router.post('/', createLimiter, validateCreateTask, asyncHandler(createTask));
 
 // PUT /api/tasks/:id - Actualizar una tarea
-router.put('/:id', async (req: Request, res: Response): Promise<void> => {
-    try {
-        const { title, description, completed, priority, dueDate } = req.body;
-        const task = await Task.findByIdAndUpdate(
-            req.params.id,
-            { title, description, completed, priority, dueDate },
-            { new: true, runValidators: true }
-        );
-        if (!task) {
-            res.status(404).json({ error: 'Tarea no encontrada' });
-            return;
-        }
-        res.json(task);
-    } catch (error) {
-        if (error instanceof Error) {
-            res.status(400).json({ error: error.message });
-        } else {
-            res.status(500).json({ error: 'Error al actualizar la tarea' });
-        }
-    }
-});
+router.put('/:id', validateUpdateTask, asyncHandler(updateTask));
 
 // DELETE /api/tasks/:id - Eliminar una tarea
-router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
-    try {
-        const task = await Task.findByIdAndDelete(req.params.id);
-        if (!task) {
-            res.status(404).json({ error: 'Tarea no encontrada' });
-            return;
-        }
-        res.json({ message: 'Tarea eliminada correctamente' });
-    } catch (error) {
-        res.status(500).json({ error: 'Error al eliminar la tarea' });
-    }
-});
+router.delete('/:id', validateTaskId, asyncHandler(deleteTask));
 
 // PATCH /api/tasks/:id/toggle - Alternar estado completado
-router.patch('/:id/toggle', async (req: Request, res: Response): Promise<void> => {
-    try {
-        const task = await Task.findById(req.params.id);
-        if (!task) {
-            res.status(404).json({ error: 'Tarea no encontrada' });
-            return;
-        }
-        task.completed = !task.completed;
-        await task.save();
-        res.json(task);
-    } catch (error) {
-        res.status(500).json({ error: 'Error al actualizar la tarea' });
-    }
-});
+router.patch('/:id/toggle', validateTaskId, asyncHandler(toggleTask));
 
 export default router;
