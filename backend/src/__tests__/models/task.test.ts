@@ -1,4 +1,8 @@
+import mongoose from 'mongoose';
 import { Task } from '../../models/Task.js';
+
+// ID de usuario válido para pruebas
+const testUserId = new mongoose.Types.ObjectId();
 
 describe('Task Model', () => {
     describe('Validaciones', () => {
@@ -6,7 +10,8 @@ describe('Task Model', () => {
             const taskData = {
                 title: 'Test Task',
                 description: 'Test Description',
-                priority: 'medium' as const
+                priority: 'medium' as const,
+                userId: testUserId
             };
 
             const task = new Task(taskData);
@@ -17,11 +22,18 @@ describe('Task Model', () => {
             expect(savedTask.description).toBe(taskData.description);
             expect(savedTask.priority).toBe(taskData.priority);
             expect(savedTask.completed).toBe(false);
+            expect(savedTask.userId.toString()).toBe(testUserId.toString());
             expect(savedTask.createdAt).toBeDefined();
         });
 
         it('debería fallar sin título', async () => {
-            const task = new Task({ description: 'Sin título' });
+            const task = new Task({ description: 'Sin título', userId: testUserId });
+
+            await expect(task.save()).rejects.toThrow();
+        });
+
+        it('debería fallar sin userId', async () => {
+            const task = new Task({ title: 'Sin userId' });
 
             await expect(task.save()).rejects.toThrow();
         });
@@ -29,7 +41,8 @@ describe('Task Model', () => {
         it('debería fallar con prioridad inválida', async () => {
             const task = new Task({
                 title: 'Test',
-                priority: 'invalid'
+                priority: 'invalid',
+                userId: testUserId
             });
 
             await expect(task.save()).rejects.toThrow();
@@ -37,13 +50,13 @@ describe('Task Model', () => {
 
         it('debería fallar si el título excede 100 caracteres', async () => {
             const longTitle = 'a'.repeat(101);
-            const task = new Task({ title: longTitle });
+            const task = new Task({ title: longTitle, userId: testUserId });
 
             await expect(task.save()).rejects.toThrow();
         });
 
         it('debería usar valores por defecto correctos', async () => {
-            const task = new Task({ title: 'Test' });
+            const task = new Task({ title: 'Test', userId: testUserId });
             const savedTask = await task.save();
 
             expect(savedTask.completed).toBe(false);
@@ -57,7 +70,8 @@ describe('Task Model', () => {
             const dueDate = new Date('2024-12-31');
             const task = new Task({
                 title: 'Task con fecha',
-                dueDate
+                dueDate,
+                userId: testUserId
             });
             const savedTask = await task.save();
 
@@ -65,7 +79,7 @@ describe('Task Model', () => {
         });
 
         it('debería actualizar completed a true', async () => {
-            const task = new Task({ title: 'Test' });
+            const task = new Task({ title: 'Test', userId: testUserId });
             await task.save();
 
             task.completed = true;

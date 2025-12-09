@@ -10,17 +10,36 @@ import { generalLimiter } from './middleware/rateLimiter.js';
 
 // Routes
 import taskRoutes from './routes/tasks.js';
+import authRoutes from './routes/auth.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Configuración de CORS - orígenes permitidos
+const allowedOrigins = [
+    'https://cheerful-respect-production.up.railway.app',
+    'http://localhost:5173', // Desarrollo frontend
+    'http://localhost:3000'  // Desarrollo local
+];
+
 // Middlewares de seguridad y parsing
 app.use(helmet());
-app.use(cors());
+app.use(cors({
+    origin: (origin, callback) => {
+        // Permitir requests sin origin (Postman, apps móviles, server-to-server)
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error('No permitido por CORS'));
+        }
+    },
+    credentials: true
+}));
 app.use(express.json());
 app.use(generalLimiter); // Rate limiting global
 
 // Rutas API
+app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
 
 // Health check para Railway

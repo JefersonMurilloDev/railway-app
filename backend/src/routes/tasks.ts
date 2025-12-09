@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import asyncHandler from '../utils/asyncHandler.js';
+import { protect } from '../middleware/auth.js';
 import { validateCreateTask, validateUpdateTask, validateTaskId } from '../middleware/validators.js';
 import { createLimiter } from '../middleware/rateLimiter.js';
 import {
@@ -13,7 +14,10 @@ import {
 
 const router = Router();
 
-// GET /api/tasks - Obtener todas las tareas
+// Todas las rutas de tareas requieren autenticación
+router.use(asyncHandler(protect));
+
+// GET /api/tasks - Obtener todas las tareas del usuario
 router.get('/', asyncHandler(getTasks));
 
 // GET /api/tasks/:id - Obtener una tarea por ID

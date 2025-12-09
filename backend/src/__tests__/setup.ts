@@ -10,13 +10,8 @@ beforeAll(async () => {
     await mongoose.connect(mongoUri);
 });
 
-// Limpiar la base de datos después de cada test
-afterEach(async () => {
-    const collections = mongoose.connection.collections;
-    for (const key in collections) {
-        await collections[key].deleteMany({});
-    }
-});
+// NO limpiamos entre tests para permitir tests que requieren persistencia
+// Cada test usa emails únicos para evitar conflictos
 
 // Desconectar y detener el servidor después de todos los tests
 afterAll(async () => {

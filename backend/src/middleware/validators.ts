@@ -94,3 +94,43 @@ export const validateTaskId = [
 
     handleValidation
 ];
+
+/**
+ * Validaciones para registro de usuario
+ */
+export const validateRegister = [
+    body('name')
+        .trim()
+        .notEmpty().withMessage('El nombre es requerido')
+        .isLength({ max: 50 }).withMessage('El nombre no puede exceder 50 caracteres')
+        .escape(),
+
+    body('email')
+        .trim()
+        .notEmpty().withMessage('El email es requerido')
+        .isEmail().withMessage('Por favor ingresa un email válido')
+        .normalizeEmail(),
+
+    body('password')
+        .notEmpty().withMessage('La contraseña es requerida')
+        .isLength({ min: 6 }).withMessage('La contraseña debe tener al menos 6 caracteres'),
+
+    handleValidation
+];
+
+/**
+ * Validaciones para login
+ */
+export const validateLogin = [
+    body('email')
+        .trim()
+        .notEmpty().withMessage('El email es requerido')
+        .isEmail().withMessage('Por favor ingresa un email válido')
+        .normalizeEmail(),
+
+    body('password')
+        .notEmpty().withMessage('La contraseña es requerida'),
+
+    handleValidation
+];
+
