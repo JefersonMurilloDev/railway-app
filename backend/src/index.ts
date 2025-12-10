@@ -15,6 +15,10 @@ import authRoutes from './routes/auth.js';
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Confiar en el proxy de Railway para obtener IP real del cliente
+// Necesario para que express-rate-limit funcione correctamente
+app.set('trust proxy', 1);
+
 // Configuración de CORS - orígenes permitidos
 const allowedOrigins = [
     'https://cheerful-respect-production.up.railway.app',
