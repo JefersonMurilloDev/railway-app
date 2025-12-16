@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import TaskManager from './components/TaskManager.vue';
+import AccountsManager from './components/AccountsManager.vue';
 import AuthForm from './components/AuthForm.vue';
 import { isAuthenticated, getUser, logout as authLogout, type User } from './services/auth';
 
@@ -8,6 +9,7 @@ const authenticated = ref(false);
 const user = ref<User | null>(null);
 const loading = ref(true);
 const serverError = ref<string | null>(null);
+const currentView = ref<'tasks' | 'accounts'>('accounts');
 
 onMounted(() => {
     checkAuth();
@@ -49,8 +51,27 @@ const logout = () => {
       </div>
 
       <div v-else key="app" class="relative min-h-dvh w-full flex flex-col">
-        <!-- Minimal Header with User Name -->
-        <header class="flex justify-end items-center py-4 px-4 sm:px-6 mb-2 border-b border-white/5 mx-auto max-w-4xl w-full">
+        <!-- Header with Navigation -->
+        <header class="flex justify-between items-center py-4 px-4 sm:px-6 mb-2 border-b border-white/5 mx-auto max-w-4xl w-full">
+          <!-- Navigation Tabs -->
+          <nav class="flex gap-2">
+            <button
+              @click="currentView = 'tasks'"
+              class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+              :class="currentView === 'tasks' ? 'bg-primary text-white' : 'bg-white/5 text-text-muted hover:bg-white/10'"
+            >
+              📋 Tareas
+            </button>
+            <button
+              @click="currentView = 'accounts'"
+              class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
+              :class="currentView === 'accounts' ? 'bg-primary text-white' : 'bg-white/5 text-text-muted hover:bg-white/10'"
+            >
+              💳 Cuentas
+            </button>
+          </nav>
+
+          <!-- User Info & Logout -->
           <div class="flex items-center gap-3 sm:gap-4">
             <span class="text-text-secondary text-sm font-medium truncate max-w-[150px] sm:max-w-none">Hola, {{ user?.name }}</span>
             <button 
@@ -69,7 +90,10 @@ const logout = () => {
         </header>
 
         <main class="flex-1 w-full flex flex-col">
-          <TaskManager />
+          <Transition name="fade-slide" mode="out-in">
+            <TaskManager v-if="currentView === 'tasks'" key="tasks" />
+            <AccountsManager v-else key="accounts" />
+          </Transition>
         </main>
       </div>
     </Transition>

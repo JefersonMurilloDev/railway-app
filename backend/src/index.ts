@@ -11,6 +11,8 @@ import { generalLimiter } from './middleware/rateLimiter.js';
 // Routes
 import taskRoutes from './routes/tasks.js';
 import authRoutes from './routes/auth.js';
+import accountRoutes from './routes/accounts.js';
+import expenseRoutes from './routes/expenses.js';
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -45,6 +47,8 @@ app.use(generalLimiter); // Rate limiting global
 // Rutas API
 app.use('/api/auth', authRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/accounts', accountRoutes);
+app.use('/api/expenses', expenseRoutes);
 
 // Health check para Railway
 app.get('/health', (_req, res) => {
