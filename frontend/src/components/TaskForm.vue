@@ -16,7 +16,6 @@ const description = ref(props.initialData?.description || '');
 const priority = ref(props.initialData?.priority || 'medium');
 const dueDate = ref(props.initialData?.dueDate?.split('T')[0] || '');
 
-// Watch for changes when editing a task
 watch(() => props.initialData, (newData) => {
   if (newData) {
     title.value = newData.title;
@@ -43,277 +42,91 @@ const handleSubmit = () => {
   }
 };
 
-// Get tomorrow's date for min attribute
-const tomorrow = new Date();
-tomorrow.setDate(tomorrow.getDate() + 1);
 const minDate = new Date().toISOString().split('T')[0];
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="task-form card">
+  <form @submit.prevent="handleSubmit" class="p-6">
     <!-- Main inputs -->
-    <div class="form-main">
+    <div class="flex flex-col gap-3 mb-4">
       <input 
         v-model="title" 
         type="text" 
         placeholder="¿Qué necesitas hacer hoy?" 
-        class="input input-title"
+        class="w-full bg-transparent border-none text-xl font-medium placeholder-white/40 focus:outline-none focus:ring-0 p-0"
         required
         autofocus
       />
       <textarea 
         v-model="description" 
         placeholder="Añade detalles o notas..." 
-        class="input input-desc"
+        class="w-full bg-transparent border-none text-base placeholder-white/40 focus:outline-none focus:ring-0 resize-none min-h-[60px] p-0"
         rows="2"
       ></textarea>
     </div>
     
     <!-- Options Row -->
-    <div class="form-options">
+    <div class="flex gap-4 flex-col sm:flex-row mb-4">
       <!-- Due Date -->
-      <div class="option-group date-group">
-        <label class="field-label">📅 Fecha</label>
-        <div class="date-input-wrapper">
+      <div class="flex-1 sm:min-w-[140px]">
+        <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">📅 Fecha</label>
+        <div class="relative inline-block w-full">
           <input 
             type="date" 
             v-model="dueDate" 
-            class="input input-date"
+            class="w-full bg-white/5 border border-white/10 rounded-lg pl-3 pr-16 py-2 text-sm text-white focus:outline-none focus:border-primary transition-all cursor-pointer min-w-full sm:min-w-[150px] appearance-none"
             :min="minDate"
           />
           <button 
             type="button" 
             v-if="dueDate" 
             @click="dueDate = ''" 
-            class="clear-date"
+            class="absolute right-9 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center bg-white/10 rounded-full text-text-muted text-[10px] hover:bg-danger hover:text-white transition-all border-none cursor-pointer"
             title="Quitar fecha"
           >✕</button>
         </div>
       </div>
 
       <!-- Priority -->
-      <div class="option-group priority-group">
-        <label class="field-label">Prioridad</label>
-        <div class="priority-options">
-          <label class="priority-option" :class="{ active: priority === 'low' }">
-            <input type="radio" v-model="priority" value="low" />
-            <span class="dot low"></span>
-            <span class="priority-text">Baja</span>
+      <div class="flex-1">
+        <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Prioridad</label>
+        <div class="flex gap-1.5 w-full">
+          <label 
+            class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer transition-all text-xs text-text-secondary hover:bg-black/30"
+            :class="{ 'bg-primary/15 border-primary text-text-primary': priority === 'low' }"
+          >
+            <input type="radio" v-model="priority" value="low" class="hidden" />
+            <span class="w-2 h-2 rounded-full bg-success shrink-0"></span>
+            <span class="hidden sm:inline">Baja</span>
           </label>
-          <label class="priority-option" :class="{ active: priority === 'medium' }">
-            <input type="radio" v-model="priority" value="medium" />
-            <span class="dot medium"></span>
-            <span class="priority-text">Media</span>
+          <label 
+            class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer transition-all text-xs text-text-secondary hover:bg-black/30"
+            :class="{ 'bg-primary/15 border-primary text-text-primary': priority === 'medium' }"
+          >
+            <input type="radio" v-model="priority" value="medium" class="hidden" />
+            <span class="w-2 h-2 rounded-full bg-warning shrink-0"></span>
+            <span class="hidden sm:inline">Media</span>
           </label>
-          <label class="priority-option" :class="{ active: priority === 'high' }">
-            <input type="radio" v-model="priority" value="high" />
-            <span class="dot high"></span>
-            <span class="priority-text">Alta</span>
+          <label 
+            class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer transition-all text-xs text-text-secondary hover:bg-black/30"
+            :class="{ 'bg-primary/15 border-primary text-text-primary': priority === 'high' }"
+          >
+            <input type="radio" v-model="priority" value="high" class="hidden" />
+            <span class="w-2 h-2 rounded-full bg-danger shrink-0"></span>
+            <span class="hidden sm:inline">Alta</span>
           </label>
         </div>
       </div>
     </div>
     
     <!-- Actions -->
-    <div class="form-actions">
-      <button type="button" v-if="initialData" @click="$emit('cancel')" class="btn btn-text">
+    <div class="flex gap-2 justify-end mt-6">
+      <button type="button" v-if="initialData" @click="$emit('cancel')" class="bg-transparent text-text-secondary border-none hover:text-text-primary px-4 py-2 font-semibold cursor-pointer transition-colors active:scale-95">
         Cancelar
       </button>
-      <button type="submit" class="btn btn-primary">
+      <button type="submit" class="px-6 py-2 rounded-xl font-semibold text-white bg-linear-to-br from-indigo-500 via-primary to-purple-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300 border-none cursor-pointer w-full sm:w-auto">
         {{ initialData ? 'Guardar' : '+ Crear Tarea' }}
       </button>
     </div>
   </form>
 </template>
-
-<style scoped>
-.task-form {
-  padding: 20px 24px;
-}
-
-.form-main {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.input-title {
-  font-size: 1.1rem;
-  font-weight: 500;
-}
-
-.input-desc {
-  resize: vertical;
-  min-height: 60px;
-  font-size: 0.95rem;
-}
-
-/* Options Row - Horizontal layout */
-.form-options {
-  display: flex;
-  gap: 16px;
-  margin-bottom: 16px;
-  flex-wrap: wrap;
-}
-
-.option-group {
-  flex: 1;
-  min-width: 140px;
-}
-
-.field-label {
-  display: block;
-  font-size: 0.75rem;
-  font-weight: 600;
-  color: var(--text-secondary);
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  margin-bottom: 8px;
-}
-
-/* Date Group */
-.date-group {
-  flex: 0 0 auto;
-}
-
-.date-input-wrapper {
-  position: relative;
-  display: inline-block;
-}
-
-.input-date {
-  padding-right: 36px;
-  cursor: pointer;
-  color-scheme: dark;
-  min-width: 150px;
-}
-
-.input-date::-webkit-calendar-picker-indicator {
-  filter: invert(1);
-  cursor: pointer;
-}
-
-.clear-date {
-  position: absolute;
-  right: 8px;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 20px;
-  height: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255,255,255,0.1);
-  border: none;
-  border-radius: 50%;
-  color: var(--text-muted);
-  font-size: 0.7rem;
-  cursor: pointer;
-  transition: var(--transition);
-}
-
-.clear-date:hover {
-  background: var(--danger);
-  color: white;
-}
-
-/* Priority Group */
-.priority-group {
-  flex: 1;
-}
-
-.priority-options {
-  display: flex;
-  gap: 6px;
-}
-
-.priority-option {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  padding: 8px 10px;
-  background: rgba(0, 0, 0, 0.2);
-  border: 1px solid var(--glass-border);
-  border-radius: var(--radius-sm);
-  cursor: pointer;
-  transition: var(--transition);
-  font-size: 0.8rem;
-  color: var(--text-secondary);
-}
-
-.priority-option input {
-  display: none;
-}
-
-.priority-option:hover {
-  background: rgba(0, 0, 0, 0.3);
-  border-color: rgba(255, 255, 255, 0.15);
-}
-
-.priority-option.active {
-  background: rgba(139, 92, 246, 0.15);
-  border-color: var(--primary);
-  color: var(--text-primary);
-}
-
-.dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  flex-shrink: 0;
-}
-
-.dot.low { background: var(--success); }
-.dot.medium { background: var(--warning); }
-.dot.high { background: var(--danger); }
-
-.form-actions {
-  display: flex;
-  gap: 8px;
-  justify-content: flex-end;
-}
-
-/* Responsive */
-@media (max-width: 480px) {
-  .form-options {
-    flex-direction: column;
-    gap: 12px;
-  }
-  
-  .option-group {
-    min-width: unset;
-  }
-  
-  .date-group {
-    flex: 1;
-  }
-  
-  .input-date {
-    width: 100%;
-  }
-  
-  .priority-options {
-    justify-content: space-between;
-  }
-  
-  .priority-option {
-    flex: 1;
-    justify-content: center;
-    padding: 10px 8px;
-  }
-  
-  .priority-text {
-    display: none;
-  }
-  
-  .form-actions {
-    flex-direction: column;
-  }
-  
-  .form-actions .btn {
-    width: 100%;
-  }
-}
-</style>
-

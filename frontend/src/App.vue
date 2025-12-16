@@ -2,13 +2,13 @@
 import { ref, onMounted } from 'vue';
 import TaskManager from './components/TaskManager.vue';
 import AuthForm from './components/AuthForm.vue';
-import { isAuthenticated, getUser, logout, type User } from './services/auth';
+import { isAuthenticated, getUser, logout as authLogout, type User } from './services/auth';
 
 const authenticated = ref(false);
 const user = ref<User | null>(null);
 const loading = ref(true);
+const serverError = ref<string | null>(null);
 
-// Verificar autenticación al cargar
 onMounted(() => {
     checkAuth();
 });
@@ -19,102 +19,79 @@ const checkAuth = () => {
     loading.value = false;
 };
 
-const handleAuthSuccess = () => {
+const handleLogin = () => {
     checkAuth();
 };
 
-const handleLogout = () => {
-    logout();
+const logout = () => {
+    authLogout();
     authenticated.value = false;
     user.value = null;
 };
 </script>
 
 <template>
-    <div v-if="loading" class="loading-screen">
-        <div class="spinner"></div>
+  <div class="min-h-dvh bg-bg-primary text-text-primary font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-white">
+    <!-- Animated Warning -->
+    <div v-if="serverError" class="fixed top-0 left-0 w-full bg-danger text-white text-center py-2 z-9999 font-bold animate-pop">
+      ⚠️ Error: No se pudo conectar con el servidor ({{ serverError }})
     </div>
-    
-    <template v-else>
-        <!-- Usuario autenticado: mostrar TaskManager -->
-        <div v-if="authenticated" class="app-container">
-            <header class="app-header">
-                <div class="user-info">
-                    <span class="user-greeting">Hola, {{ user?.name }}</span>
-                    <button @click="handleLogout" class="logout-btn">
-                        Cerrar sesión
-                    </button>
-                </div>
-            </header>
-            <main>
-                <TaskManager />
-            </main>
-        </div>
 
-        <!-- No autenticado: mostrar formulario de login -->
-        <AuthForm v-else @success="handleAuthSuccess" />
-    </template>
+    <!-- Initial Loading State -->
+    <div v-if="loading" class="min-h-dvh flex items-center justify-center">
+      <div class="animate-spin h-10 w-10 border-3 border-white/10 border-t-primary rounded-full"></div>
+    </div>
+
+    <!-- Main View Transition (Only after loading) -->
+    <Transition v-else name="fade-slide" mode="out-in">
+      <div v-if="!authenticated" key="auth" class="min-h-dvh flex items-center justify-center">
+        <AuthForm @success="handleLogin" />
+      </div>
+
+      <div v-else key="app" class="relative min-h-dvh w-full flex flex-col">
+        <!-- Minimal Header with User Name -->
+        <header class="flex justify-end items-center py-4 px-4 sm:px-6 mb-2 border-b border-white/5 mx-auto max-w-4xl w-full">
+          <div class="flex items-center gap-3 sm:gap-4">
+            <span class="text-text-secondary text-sm font-medium truncate max-w-[150px] sm:max-w-none">Hola, {{ user?.name }}</span>
+            <button 
+              @click="logout" 
+              class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-medium text-text-secondary hover:bg-danger/10 hover:text-danger hover:border-danger/30 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-2"
+              title="Cerrar Sesión"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:hidden">
+                <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                <polyline points="16 17 21 12 16 7"></polyline>
+                <line x1="21" y1="12" x2="9" y2="12"></line>
+              </svg>
+              <span class="hidden sm:inline">Cerrar Sesión</span>
+            </button>
+          </div>
+        </header>
+
+        <main class="flex-1 w-full flex flex-col">
+          <TaskManager />
+        </main>
+      </div>
+    </Transition>
+  </div>
 </template>
 
 <style>
-.loading-screen {
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+/* View Transitions */
+.fade-slide-enter-active,
+.fade-slide-leave-active {
+  transition: all 0.4s var(--ease-card);
 }
 
-.loading-screen .spinner {
-    width: 50px;
-    height: 50px;
-    border: 4px solid rgba(255, 255, 255, 0.1);
-    border-top-color: #8b5cf6;
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+.fade-slide-enter-from {
+  opacity: 0;
+  transform: translateY(10px);
+  filter: blur(4px);
 }
 
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.app-container {
-    min-height: 100vh;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
-}
-
-.app-header {
-    padding: 16px 24px;
-    display: flex;
-    justify-content: flex-end;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.user-info {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-}
-
-.user-greeting {
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.95rem;
-}
-
-.logout-btn {
-    padding: 8px 16px;
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 8px;
-    color: rgba(255, 255, 255, 0.8);
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.logout-btn:hover {
-    background: rgba(239, 68, 68, 0.2);
-    border-color: rgba(239, 68, 68, 0.4);
-    color: #fca5a5;
+.fade-slide-leave-to {
+  opacity: 0;
+  transform: translateY(-10px);
+  filter: blur(4px);
 }
 </style>
