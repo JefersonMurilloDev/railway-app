@@ -16,7 +16,6 @@ const expenses = ref<Expense[]>([]);
 const loading = ref(true);
 const showAddModal = ref(false);
 const editingExpense = ref<Expense | null>(null);
-const filter = ref<'all' | 'gastos' | 'ingresos'>('all');
 
 // Formatear moneda usando la de la cuenta
 const formatCurrency = (value: number): string => {
@@ -38,17 +37,8 @@ const totalExpenses = computed(() => expenses.value.reduce((sum, e) => sum + e.a
 const currentBalance = computed(() => (props.account.initialBalance || 0) - totalExpenses.value);
 const pendingReceipts = computed(() => expenses.value.filter(e => !e.hasReceipt).length);
 
-// Filtrar gastos
-const filteredExpenses = computed(() => {
-    switch (filter.value) {
-        case 'gastos':
-            return expenses.value.filter(e => e.amount > 0);
-        case 'ingresos':
-            return expenses.value.filter(e => e.amount < 0);
-        default:
-            return expenses.value;
-    }
-});
+// Filtrar para mostrar solo gastos
+const visibleExpenses = computed(() => expenses.value.filter(e => e.amount > 0));
 
 // Cargar gastos
 const fetchExpenses = async () => {
@@ -116,186 +106,233 @@ onMounted(fetchExpenses);
 </script>
 
 <template>
-  <div class="flex-1 max-w-5xl mx-auto w-full px-4 py-8 pb-28">
-    <!-- Header con Back -->
-    <div class="flex items-center gap-4 mb-6">
-      <button
-        @click="emit('back')"
-        class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-text-muted hover:bg-white/10 hover:text-primary transition-all"
-      >
-        ←
-      </button>
-      <div>
-        <h1
-          class="text-2xl md:text-3xl font-bold"
-          :style="{ color: account.color }"
+  <div class="flex-1 max-w-6xl mx-auto w-full px-4 py-8 pb-10 flex flex-col h-[calc(100vh-80px)] overflow-hidden">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-6 mb-8 shrink-0">
+      <div class="flex items-center gap-4">
+        <button
+          @click="emit('back')"
+          class="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center text-text-muted hover:bg-white/10 hover:text-primary transition-all active:scale-95 cursor-pointer"
         >
-          {{ account.name }}
-        </h1>
-        <p class="text-text-muted text-sm">Gestiona tus gastos y visualiza tus transacciones recientes.</p>
-      </div>
-    </div>
-
-    <!-- Stats Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
-        <p class="text-xs uppercase tracking-wider text-text-muted mb-1">Balance Actual</p>
-        <p class="text-3xl font-bold" :class="currentBalance >= 0 ? 'text-success' : 'text-danger'">
-          {{ formatCurrency(currentBalance) }}
-        </p>
-        <p class="text-xs text-success mt-1" v-if="currentBalance >= 0">↗ +12% vs mes anterior</p>
-      </div>
-      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
-        <p class="text-xs uppercase tracking-wider text-text-muted mb-1">Gastos del Mes</p>
-        <p class="text-3xl font-bold text-warning">{{ formatCurrency(totalExpenses) }}</p>
-        <p class="text-xs text-primary mt-1">↑ Mayor gasto: Renta</p>
-      </div>
-      <div class="bg-white/5 border border-white/10 rounded-2xl p-5">
-        <p class="text-xs uppercase tracking-wider text-text-muted mb-1">Por Procesar</p>
-        <p class="text-3xl font-bold text-text-secondary">{{ pendingReceipts }}</p>
-        <p class="text-xs text-primary mt-1">📎 Recibos pendientes de revisión</p>
-      </div>
-    </div>
-
-    <!-- Transacciones -->
-    <div class="bg-white/5 border border-white/10 rounded-2xl overflow-hidden">
-      <div class="flex items-center justify-between p-5 border-b border-white/10">
-        <h2 class="text-lg font-semibold">Transacciones Recientes</h2>
-        <div class="flex gap-2">
-          <button
-            v-for="f in [{ key: 'all', label: 'Todo' }, { key: 'gastos', label: 'Gastos' }, { key: 'ingresos', label: 'Ingresos' }]"
-            :key="f.key"
-            @click="filter = f.key as any"
-            class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-            :class="filter === f.key ? 'bg-primary text-white' : 'bg-white/5 text-text-muted hover:bg-white/10'"
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+        </button>
+        <div>
+          <h1
+            class="text-3xl font-black tracking-tight"
+            :style="{ color: account.color }"
           >
-            {{ f.label }}
-          </button>
+            {{ account.name }}
+          </h1>
+          <p class="text-text-muted text-xs font-medium uppercase tracking-widest mt-1">Gestión de Movimientos y Balance</p>
+        </div>
+      </div>
+      
+      <button
+        @click="showAddModal = true"
+        class="group relative px-6 py-3 bg-primary text-white rounded-xl font-bold text-sm shadow-xl shadow-primary/20 hover:shadow-primary/40 hover:-translate-y-0.5 active:translate-y-0 transition-all overflow-hidden cursor-pointer"
+      >
+        <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
+        <span class="relative flex items-center gap-2">
+          <span class="text-lg leading-none">+</span> Nueva Transacción
+        </span>
+      </button>
+    </div>
+
+    <!-- Scrollable Content Container -->
+    <div class="flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar pr-2 space-y-8">
+      
+      <!-- Stats Cards -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- Balance -->
+        <div class="glass-card hover:bg-white/3 transition-colors p-6 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 rounded-xl bg-green-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
+              💎
+            </div>
+            <span class="text-[10px] bg-white/5 px-2 py-1 rounded-lg text-text-muted font-mono tracking-wider">TOTAL</span>
+          </div>
+          <div>
+            <p class="text-text-muted text-[10px] font-black uppercase tracking-widest mb-1">Balance Disponible</p>
+            <p class="text-3xl font-black tracking-tight text-white mb-1" :class="currentBalance >= 0 ? 'text-white' : 'text-danger'">
+              {{ formatCurrency(currentBalance) }}
+            </p>
+            <p class="text-xs font-medium" :class="currentBalance >= 0 ? 'text-emerald-400' : 'text-rose-400'">
+              {{ currentBalance >= 0 ? '▲ Saludable' : '▼ En negativo' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Gastos -->
+        <div class="glass-card hover:bg-white/3 transition-colors p-6 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 rounded-xl bg-rose-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
+              📉
+            </div>
+            <span class="text-[10px] bg-white/5 px-2 py-1 rounded-lg text-text-muted font-mono tracking-wider">MES</span>
+          </div>
+          <div>
+            <p class="text-text-muted text-[10px] font-black uppercase tracking-widest mb-1">Gastos Totales</p>
+            <p class="text-3xl font-black tracking-tight text-rose-400 mb-1">
+              {{ formatCurrency(totalExpenses) }}
+            </p>
+            <p class="text-xs text-text-muted font-medium">Mayor gasto esta semana</p>
+          </div>
+        </div>
+
+        <!-- Pendientes -->
+        <div class="glass-card hover:bg-white/3 transition-colors p-6 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-10 h-10 rounded-xl bg-amber-500/10 flex items-center justify-center text-xl group-hover:scale-110 transition-transform duration-300">
+              ⚡
+            </div>
+             <span class="text-[10px] bg-white/5 px-2 py-1 rounded-lg text-text-muted font-mono tracking-wider">ACTION</span>
+          </div>
+          <div>
+            <p class="text-text-muted text-[10px] font-black uppercase tracking-widest mb-1">Por Procesar</p>
+            <p class="text-3xl font-black tracking-tight text-white mb-1">
+              {{ pendingReceipts }}
+            </p>
+            <p class="text-xs text-amber-400 font-medium">Recibos pendientes</p>
+          </div>
         </div>
       </div>
 
-      <!-- Loading -->
-      <div v-if="loading" class="p-8 text-center text-text-muted">
-        <div class="animate-spin h-8 w-8 border-2 border-white/10 border-t-primary rounded-full mx-auto mb-3"></div>
-        <p>Cargando transacciones...</p>
-      </div>
+      <!-- Transacciones List -->
+      <div class="glass-card overflow-hidden flex flex-col">
+        <!-- Toolbar -->
+        <div class="p-6 border-b border-white/5 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <h2 class="text-lg font-bold text-white flex items-center gap-2">
+            <span class="w-1 h-6 bg-primary rounded-full"></span>
+            Transacciones
+          </h2>
+        </div>
 
-      <!-- Empty -->
-      <div v-else-if="expenses.length === 0" class="p-8 text-center">
-        <div class="text-4xl mb-3">💸</div>
-        <p class="text-text-muted">Sin transacciones aún</p>
-      </div>
+        <!-- Loading -->
+        <div v-if="loading" class="p-12 text-center text-text-muted">
+          <div class="animate-spin h-8 w-8 border-2 border-white/10 border-t-primary rounded-full mx-auto mb-4"></div>
+          <p class="text-sm font-medium animate-pulse">Sincronizando movimientos...</p>
+        </div>
 
-      <!-- Table -->
-      <div v-else class="overflow-x-auto">
-        <table class="w-full">
-          <thead class="bg-white/5">
-            <tr class="text-left text-xs uppercase tracking-wider text-text-muted">
-              <th class="p-4">Concepto</th>
-              <th class="p-4">Categoría</th>
-              <th class="p-4">Fecha</th>
-              <th class="p-4">Recibo</th>
-              <th class="p-4 text-right">Monto</th>
-              <th class="p-4 text-center">Acciones</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr
-              v-for="expense in filteredExpenses"
-              :key="expense._id"
-              class="border-t border-white/5 hover:bg-white/5 transition-colors"
-            >
-              <td class="p-4">
-                <div class="flex items-center gap-3">
-                  <div class="w-8 h-8 rounded-lg bg-primary/20 flex items-center justify-center text-primary">
-                    💸
-                  </div>
-                  <div>
-                    <p class="font-medium text-text-primary">{{ expense.description }}</p>
-                    <p class="text-xs text-text-muted">{{ expense.category ?? 'General' }}</p>
-                  </div>
-                </div>
-              </td>
-              <td class="p-4">
-                <span
-                  class="px-2 py-1 rounded-full text-xs font-medium"
-                  :class="getCategoryBadge(expense.category ?? 'General').color"
-                >
-                  {{ getCategoryBadge(expense.category ?? 'General').label }}
-                </span>
-              </td>
-              <td class="p-4 text-text-muted text-sm">
-                {{ formatDate(expense.date ?? new Date().toISOString()) }}
-              </td>
-              <td class="p-4">
-                <a
-                  v-if="expense.hasReceipt"
-                  :href="getExpenseImageUrl(expense._id!)"
-                  target="_blank"
-                  class="text-primary text-sm hover:underline"
-                >
-                  📎 Ver recibo
-                </a>
-                <span v-else class="text-text-muted text-sm italic">Sin recibo</span>
-              </td>
-              <td class="p-4 text-right font-bold text-danger">
-                -{{ formatCurrency(expense.amount) }}
-              </td>
-              <td class="p-4 text-center">
-                <div class="flex gap-2 justify-center">
-                  <button
-                    @click="openEditModal(expense)"
-                    class="w-7 h-7 rounded-lg bg-white/10 text-text-muted hover:bg-primary/20 hover:text-primary transition-all flex items-center justify-center"
-                    title="Editar"
-                  >
-                    ✏️
-                  </button>
-                  <button
-                    @click="handleDelete(expense._id!)"
-                    class="w-7 h-7 rounded-lg bg-white/10 text-text-muted hover:bg-danger/20 hover:text-danger transition-all flex items-center justify-center"
-                    title="Eliminar"
-                  >
-                    🗑️
-                  </button>
-                </div>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <!-- Pagination -->
-      <div v-if="expenses.length > 0" class="flex items-center justify-between p-4 border-t border-white/10 text-sm text-text-muted">
-        <p>Mostrando {{ filteredExpenses.length }} de {{ expenses.length }} transacciones</p>
-        <div class="flex gap-2">
-          <button class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-            Anterior
+        <!-- Empty -->
+        <div v-else-if="expenses.length === 0" class="p-16 text-center flex flex-col items-center">
+          <div class="w-20 h-20 bg-white/5 rounded-full flex items-center justify-center text-4xl mb-6 shadow-inner ring-1 ring-white/10">✨</div>
+          <h3 class="text-xl font-bold text-white mb-2">Comienza tu historial</h3>
+          <p class="text-text-muted max-w-xs mx-auto text-sm">Registra tu primera transacción para ver el análisis detallado de tus finanzas.</p>
+          <button 
+             @click="showAddModal = true"
+             class="mt-6 px-6 py-2 rounded-lg bg-white/5 text-primary text-xs font-bold uppercase tracking-widest hover:bg-white/10 transition-colors"
+          >
+            Crear ahora
           </button>
-          <button class="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 transition-all">
-            Siguiente
-          </button>
+        </div>
+
+        <!-- Table -->
+        <div v-else class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-black/20">
+              <tr class="text-left text-[10px] uppercase font-black tracking-widest text-text-muted">
+                <th class="p-5 pl-8">Concepto</th>
+                <th class="p-5">Categoría</th>
+                <th class="p-5">Fecha</th>
+                <th class="p-5">Recibo</th>
+                <th class="p-5 text-right">Monto</th>
+                <th class="p-5 text-center pr-8">Acciones</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-white/5">
+              <tr
+                v-for="expense in visibleExpenses"
+                :key="expense._id"
+                class="hover:bg-white/2 transition-colors group"
+              >
+                <td class="p-5 pl-8">
+                  <div class="flex items-center gap-4">
+                    <div 
+                      class="w-10 h-10 rounded-xl flex items-center justify-center text-lg shadow-sm"
+                      :class="expense.amount >= 0 ? 'bg-red-500/10 text-red-400' : 'bg-green-500/10 text-green-400'"
+                    >
+                      {{ expense.amount >= 0 ? '💸' : '💰' }}
+                    </div>
+                    <div>
+                      <p class="font-bold text-text-primary text-sm group-hover:text-white transition-colors">{{ expense.description }}</p>
+                      <p class="text-[10px] text-text-muted mt-0.5">{{ expense._id?.substring(expense._id.length - 6) }}</p>
+                    </div>
+                  </div>
+                </td>
+                <td class="p-5">
+                  <span
+                    class="px-2.5 py-1 rounded-lg text-[10px] font-black uppercase tracking-wider"
+                    :class="getCategoryBadge(expense.category ?? 'General').color"
+                  >
+                    {{ getCategoryBadge(expense.category ?? 'General').label }}
+                  </span>
+                </td>
+                <td class="p-5">
+                   <div class="flex flex-col">
+                      <span class="text-xs font-bold text-text-secondary">{{ formatDate(expense.date ?? new Date().toISOString()) }}</span>
+                      <span class="text-[10px] text-text-muted">Procesado</span>
+                   </div>
+                </td>
+                <td class="p-5">
+                  <a
+                    v-if="expense.hasReceipt"
+                    :href="getExpenseImageUrl(expense._id!)"
+                    target="_blank"
+                    class="inline-flex items-center gap-1 text-xs font-bold text-primary hover:text-primary-hover hover:underline decoration-2 underline-offset-4 transition-colors"
+                  >
+                    <span>📎</span> Ver Adjunto
+                  </a>
+                  <span v-else class="text-[10px] text-text-muted font-medium opacity-50">--</span>
+                </td>
+                <td class="p-5 text-right">
+                  <span class="font-bold text-sm tracking-tight" :class="expense.amount >= 0 ? 'text-rose-400' : 'text-emerald-400'">
+                    {{ expense.amount >= 0 ? '-' : '+' }}{{ formatCurrency(Math.abs(expense.amount)) }}
+                  </span>
+                </td>
+                <td class="p-5 pr-8">
+                  <div class="flex gap-2 justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      @click="openEditModal(expense)"
+                      class="w-8 h-8 rounded-lg bg-white/5 text-text-muted hover:bg-primary/20 hover:text-primary transition-all flex items-center justify-center cursor-pointer"
+                      title="Editar"
+                    >
+                      <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+                    </button>
+                    <button
+                      @click="handleDelete(expense._id!)"
+                      class="w-8 h-8 rounded-lg bg-white/5 text-text-muted hover:bg-danger/20 hover:text-danger transition-all flex items-center justify-center cursor-pointer"
+                      title="Eliminar"
+                    >
+                      <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- PaginationFooter -->
+         <div v-if="expenses.length > 0" class="flex items-center justify-between p-6 border-t border-white/5 bg-black/10">
+          <p class="text-xs text-text-muted font-medium">Mostrando <span class="text-white">{{ visibleExpenses.length }}</span> registros</p>
+          <div class="flex gap-2">
+            <button class="px-4 py-2 rounded-lg bg-white/5 text-xs font-bold uppercase tracking-wider text-text-muted hover:bg-white/10 hover:text-white transition-all disabled:opacity-50" disabled>
+              Anterior
+            </button>
+            <button class="px-4 py-2 rounded-lg bg-white/5 text-xs font-bold uppercase tracking-wider text-text-muted hover:bg-white/10 hover:text-white transition-all">
+              Siguiente
+            </button>
+          </div>
         </div>
       </div>
     </div>
-
-    <!-- FAB -->
-    <button
-      v-if="!showAddModal"
-      @click="showAddModal = true"
-      title="Nuevo gasto"
-      class="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-linear-to-br from-primary to-purple-600 text-white cursor-pointer flex items-center justify-center shadow-lg shadow-primary/40 transition-all duration-300 hover:scale-110 hover:rotate-90 active:scale-90 z-50"
-    >
-      <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-    </button>
 
     <!-- Add/Edit Expense Modal -->
     <Transition name="modal">
       <div
         v-if="showAddModal"
         @click.self="handleCancelModal"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center z-200 p-5 sm:items-center sm:p-5 items-end pb-0 sm:pb-5"
+        class="fixed inset-0 bg-black/80 backdrop-blur-md flex justify-center z-200 p-4 items-center"
       >
         <AddExpenseModal
           :account-id="account._id!"
@@ -310,19 +347,14 @@ onMounted(fetchExpenses);
 </template>
 
 <style scoped>
-/* Modal Transitions */
 .modal-enter-active,
 .modal-leave-active {
-  transition: all 0.3s var(--ease-card);
+  transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .modal-enter-from,
 .modal-leave-to {
   opacity: 0;
-}
-
-.modal-enter-from .bg-bg-secondary,
-.modal-leave-to .bg-bg-secondary {
-  transform: scale(0.95) translateY(10px);
+  transform: scale(0.98);
 }
 </style>

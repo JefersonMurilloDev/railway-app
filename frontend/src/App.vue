@@ -49,39 +49,39 @@ const handleDeleteAccount = async () => {
 </script>
 
 <template>
-  <div class="min-h-dvh bg-bg-primary text-text-primary font-sans antialiased overflow-x-hidden selection:bg-primary selection:text-white">
+  <div class="h-full w-full bg-bg-primary text-text-primary font-sans antialiased overflow-hidden selection:bg-primary selection:text-white flex flex-col">
     <!-- Animated Warning -->
     <div v-if="serverError" class="fixed top-0 left-0 w-full bg-danger text-white text-center py-2 z-9999 font-bold animate-pop">
       ⚠️ Error: No se pudo conectar con el servidor ({{ serverError }})
     </div>
 
     <!-- Initial Loading State -->
-    <div v-if="loading" class="min-h-dvh flex items-center justify-center">
+    <div v-if="loading" class="h-full flex items-center justify-center">
       <div class="animate-spin h-10 w-10 border-3 border-white/10 border-t-primary rounded-full"></div>
     </div>
 
     <!-- Main View Transition (Only after loading) -->
     <Transition v-else name="fade-slide" mode="out-in">
-      <div v-if="!authenticated" key="auth" class="min-h-dvh flex items-center justify-center">
+      <div v-if="!authenticated" key="auth" class="h-full flex items-center justify-center overflow-y-auto">
         <AuthForm @success="handleLogin" />
       </div>
 
-      <div v-else key="app" class="relative min-h-dvh w-full flex flex-col">
+      <div v-else key="app" class="relative h-full w-full flex flex-col overflow-hidden">
         <!-- Header with Navigation -->
-        <header class="flex justify-between items-center py-4 px-4 sm:px-6 mb-2 border-b border-white/5 mx-auto max-w-4xl w-full">
+        <header class="flex-none flex justify-between items-center py-6 px-6 sm:px-8 mb-4 border-b border-white/5 mx-auto max-w-6xl w-full">
           <!-- Navigation Tabs -->
-          <nav class="flex gap-2">
+          <nav class="flex bg-white/5 p-1 rounded-xl border border-white/5">
             <button
               @click="currentView = 'tasks'"
-              class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-              :class="currentView === 'tasks' ? 'bg-primary text-white' : 'bg-white/5 text-text-muted hover:bg-white/10'"
+              class="px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300"
+              :class="currentView === 'tasks' ? 'bg-primary text-white shadow-lg' : 'text-text-muted hover:text-text-primary'"
             >
               📋 Tareas
             </button>
             <button
               @click="currentView = 'accounts'"
-              class="px-4 py-2 rounded-lg text-sm font-medium transition-all duration-300"
-              :class="currentView === 'accounts' ? 'bg-primary text-white' : 'bg-white/5 text-text-muted hover:bg-white/10'"
+              class="px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300"
+              :class="currentView === 'accounts' ? 'bg-primary text-white shadow-lg' : 'text-text-muted hover:text-text-primary'"
             >
               💳 Cuentas
             </button>
@@ -122,7 +122,7 @@ const handleDeleteAccount = async () => {
           </div>
         </header>
 
-        <main class="flex-1 w-full flex flex-col">
+        <main class="flex-1 w-full flex flex-col overflow-hidden relative">
           <Transition name="fade-slide" mode="out-in">
             <TaskManager v-if="currentView === 'tasks'" key="tasks" />
             <AccountsManager v-else key="accounts" />

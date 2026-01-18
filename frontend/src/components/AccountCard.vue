@@ -51,7 +51,7 @@ const isPositive = props.account.currentBalance ? props.account.currentBalance >
 <template>
   <div
     @click="emit('click')"
-    class="group bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 cursor-pointer transition-all duration-300 hover:bg-white/10 hover:border-primary/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10"
+    class="group h-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 cursor-pointer transition-all duration-300 hover:bg-white/10 hover:border-primary/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10"
   >
     <div class="flex items-center justify-between">
       <!-- Left: Icon & Info -->

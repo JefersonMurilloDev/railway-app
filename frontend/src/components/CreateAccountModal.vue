@@ -69,119 +69,129 @@ const handleSubmit = () => {
 </script>
 
 <template>
-  <div class="bg-bg-secondary border border-white/10 rounded-t-2xl sm:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
-    <!-- Header -->
-    <div class="text-center py-6 px-6 border-b border-white/10">
-      <h2 class="text-2xl font-bold bg-linear-to-br from-indigo-500 via-primary to-purple-500 bg-clip-text text-transparent">
+  <div class="bg-[#0f172a] border border-white/10 rounded-3xl w-full max-w-lg max-h-[90vh] shadow-2xl relative overflow-hidden flex flex-col">
+    <!-- Decorative Glow (Fixed in background) -->
+    <div class="absolute top-0 left-0 w-full h-1 bg-linear-to-r from-indigo-500 via-primary to-purple-500 z-20"></div>
+    <div class="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 blur-3xl rounded-full pointer-events-none z-0"></div>
+
+    <!-- Header (Fixed) -->
+    <div class="text-center pt-8 pb-6 px-8 relative shrink-0 z-10 bg-[#0f172a]/95 backdrop-blur-sm">
+      <h2 class="text-2xl font-black text-white tracking-tight">
         {{ initialData ? 'Editar Cuenta' : 'Nueva Cuenta' }}
       </h2>
-      <p class="text-text-muted text-sm mt-1">
-        {{ initialData ? 'Actualiza los datos de tu cuenta' : 'Registra una nueva cuenta financiera para tu balance' }}
+      <p class="text-text-muted text-xs font-medium uppercase tracking-widest mt-2">
+        {{ initialData ? 'Actualiza los datos' : 'Registra una nueva cuenta' }}
       </p>
     </div>
 
-    <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="p-6 space-y-5">
-      <!-- Nombre de la cuenta -->
-      <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">Nombre de la cuenta</label>
-        <div class="relative">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">🏦</span>
-          <input
-            v-model="name"
-            type="text"
-            placeholder="Ej. Ahorros Banco X"
-            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
-            required
-          />
+    <!-- Scrollable Content -->
+    <div class="flex-1 overflow-y-auto custom-scrollbar relative z-10 px-8">
+      <form @submit.prevent="handleSubmit" id="account-form" class="space-y-6 py-2">
+        <!-- Nombre de la cuenta -->
+        <div class="space-y-2">
+          <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Nombre de la cuenta</label>
+          <div class="relative group">
+            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-primary transition-colors">🏦</span>
+            <input
+              v-model="name"
+              type="text"
+              placeholder="Ej. Ahorros Banco Principal"
+              class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-text-primary font-bold placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all shadow-inner"
+              required
+              autofocus
+            />
+          </div>
         </div>
-      </div>
 
-      <!-- Saldo Inicial -->
-      <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">Saldo Inicial</label>
-        <div class="relative">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">$</span>
-          <input
-            v-model.number="initialBalance"
-            type="number"
-            step="0.01"
-            placeholder="0.00"
-            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
-          />
+        <!-- Saldo Inicial -->
+        <div class="space-y-2">
+          <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Saldo Disponible</label>
+          <div class="relative group">
+            <span class="absolute left-6 top-1/2 -translate-y-1/2 text-text-muted group-focus-within:text-success transition-colors font-bold">$</span>
+            <input
+              v-model.number="initialBalance"
+              type="number"
+              step="0.01"
+              placeholder="0.00"
+              class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-text-primary font-mono font-bold placeholder:text-white/20 focus:outline-none focus:border-success/50 focus:bg-white/10 transition-all shadow-inner"
+            />
+          </div>
         </div>
-      </div>
 
-      <!-- Tipo y Moneda -->
-      <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-text-secondary mb-2">Tipo</label>
-          <select
-            v-model="type"
-            class="custom-select w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
-          >
-            <option v-for="t in accountTypes" :key="t.value" :value="t.value">{{ t.label }}</option>
-          </select>
+        <!-- Tipo y Moneda -->
+        <div class="grid grid-cols-2 gap-4">
+          <div class="space-y-2">
+            <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Tipo de Cuenta</label>
+            <div class="relative">
+               <select
+                v-model="type"
+                class="w-full appearance-none bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-text-primary font-medium focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all cursor-pointer"
+              >
+                <option v-for="t in accountTypes" :key="t.value" :value="t.value" class="bg-bg-primary text-white">{{ t.label }}</option>
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          </div>
+          <div class="space-y-2">
+            <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Moneda</label>
+            <div class="relative">
+              <select
+                v-model="currency"
+                class="w-full appearance-none bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-text-primary font-medium focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all cursor-pointer"
+              >
+                <option v-for="c in currencies" :key="c.value" :value="c.value" class="bg-bg-primary text-white">{{ c.label }}</option>
+              </select>
+              <div class="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-text-muted">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
+            </div>
+          </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-text-secondary mb-2">Moneda</label>
-          <select
-            v-model="currency"
-            class="custom-select w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
-          >
-            <option v-for="c in currencies" :key="c.value" :value="c.value">{{ c.label }}</option>
-          </select>
-        </div>
-      </div>
 
-      <!-- Color Identificador -->
-      <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">Color Identificador</label>
-        <div class="flex gap-3">
-          <button
-            v-for="c in colors"
-            :key="c"
-            type="button"
-            @click="color = c"
-            class="w-10 h-10 rounded-full transition-all duration-200 hover:scale-110"
-            :class="color === c ? 'ring-2 ring-white ring-offset-2 ring-offset-bg-secondary scale-110' : 'opacity-70'"
-            :style="{ backgroundColor: c }"
-          />
+        <!-- Color Identificador -->
+        <div class="space-y-3">
+          <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Color Identificador</label>
+          <div class="bg-black/20 p-2 rounded-2xl border border-white/5 flex gap-2 justify-between">
+            <button
+              v-for="c in colors"
+              :key="c"
+              type="button"
+              @click="color = c"
+              class="w-10 h-10 rounded-xl transition-all duration-300 relative group flex items-center justify-center cursor-pointer"
+              :class="color === c ? 'scale-110 shadow-lg shadow-black/50' : 'opacity-60 hover:opacity-100 hover:scale-105'"
+              :style="{ backgroundColor: c }"
+            >
+               <div v-if="color === c" class="w-2 h-2 bg-white rounded-full shadow-sm"></div>
+            </button>
+          </div>
         </div>
-      </div>
+      </form>
+    </div>
 
-      <!-- Buttons -->
-      <div class="flex flex-col gap-3 pt-4">
-        <button
-          type="submit"
-          class="w-full py-3 rounded-xl font-bold text-white bg-linear-to-br from-indigo-500 via-primary to-purple-500 hover:shadow-lg hover:shadow-primary/40 active:scale-98 transition-all duration-300"
-        >
-          {{ initialData ? 'Actualizar Cuenta' : 'Crear Cuenta' }}
-        </button>
+    <!-- Footer Buttons (Fixed) -->
+    <div class="px-8 py-6 shrink-0 z-10 bg-[#0f172a] border-t border-white/5 mt-auto">
+      <div class="flex gap-3">
         <button
           type="button"
           @click="emit('cancel')"
-          class="w-full py-3 rounded-xl font-medium text-text-muted hover:text-text-primary hover:bg-white/5 transition-all"
+          class="px-6 py-4 rounded-2xl font-bold text-text-muted hover:text-white hover:bg-white/5 transition-all uppercase tracking-widest text-[10px]"
         >
           Cancelar
         </button>
+        <button
+          type="submit"
+          form="account-form"
+          class="flex-1 py-4 rounded-2xl font-black text-white bg-primary hover:bg-primary-hover shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-widest text-[10px]"
+        >
+          {{ initialData ? 'Actualizar Cuenta' : 'Crear Cuenta' }}
+        </button>
       </div>
-    </form>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* Fix for select dropdown options in dark mode */
-.custom-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
-
-.custom-select option {
-  background-color: #1a1a2e;
-  color: white;
-  padding: 8px;
-}
+/* Removed old custom styles as we use Tailwind classes now */
 </style>

@@ -110,153 +110,157 @@ onMounted(fetchData);
 </script>
 
 <template>
-  <div class="flex-1 flex flex-col w-full">
+  <div class="flex-1 flex flex-col w-full h-full">
     <!-- Vista de Detalles de Cuenta -->
-    <AccountDetailsView
-      v-if="selectedAccount"
-      :account="selectedAccount"
-      @back="backToAccounts"
-    />
+    <Transition name="slide">
+        <AccountDetailsView
+            v-if="selectedAccount"
+            :account="selectedAccount"
+            @back="backToAccounts"
+        />
+    </Transition>
 
     <!-- Vista Principal de Cuentas -->
-    <div v-else class="flex-1 max-w-4xl mx-auto w-full px-4 py-8 pb-28">
-      <!-- Header -->
-      <header class="text-center mb-8">
-        <h1 class="text-4xl md:text-5xl font-bold bg-linear-to-br from-indigo-500 via-primary to-purple-500 bg-clip-text text-transparent mb-2">
-          TaskFlow
-        </h1>
-        <p class="text-text-muted">Gestiona tus finanzas, controla tu futuro</p>
-      </header>
-
-      <!-- Stats Cards -->
-      <div v-if="stats && !loading" class="flex gap-3 justify-center mb-8 flex-wrap">
-        <div class="flex flex-col items-center px-7 py-4 bg-white/5 border-2 border-success/30 rounded-xl min-w-[110px]">
-          <span class="text-3xl font-bold text-success">$ {{ formatNumber(stats.totalBalance) }}</span>
-          <span class="text-xs uppercase tracking-wider mt-1 text-text-muted">Total</span>
-        </div>
-        <div class="flex flex-col items-center px-7 py-4 bg-white/5 border-2 border-white/10 rounded-xl min-w-[110px]">
-          <span class="text-3xl font-bold text-text-secondary">{{ stats.totalAccounts }}</span>
-          <span class="text-xs uppercase tracking-wider mt-1 text-text-muted">Cuentas</span>
-        </div>
-        <div class="flex flex-col items-center px-7 py-4 bg-white/5 border-2 border-danger/30 rounded-xl min-w-[110px]">
-          <span class="text-3xl font-bold text-danger">-$ {{ formatNumber(stats.totalExpensesThisMonth) }}</span>
-          <span class="text-xs uppercase tracking-wider mt-1 text-text-muted">Gastos Mes</span>
-        </div>
-      </div>
-
-      <!-- Loading -->
-      <div v-if="loading" class="text-center py-16 text-text-muted">
-        <div class="animate-spin h-10 w-10 border-3 border-white/10 border-t-primary rounded-full mx-auto mb-4"></div>
-        <p>Cargando cuentas...</p>
-      </div>
-
-      <!-- Accounts Section -->
-      <div v-else>
-        <div class="flex items-center mb-4">
-          <h2 class="text-xl font-semibold">Mis Cuentas</h2>
+    <div v-show="!selectedAccount" class="flex-1 flex flex-col max-w-6xl mx-auto w-full px-6 py-8 pb-28 overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <!-- Workspace Header (Refined) -->
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+        <div>
+          <h1 class="text-4xl font-bold tracking-tight text-white mb-2">My Finance</h1>
+          <p class="text-text-muted text-sm max-w-md">Controla tus activos y cuentas bancarias.</p>
         </div>
 
-        <!-- Empty State -->
-        <div v-if="accounts.length === 0" class="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-6 text-center py-16">
-          <div class="text-6xl mb-4">💳</div>
-          <h3 class="text-xl font-semibold text-text-primary mb-2">Sin cuentas</h3>
-          <p class="text-text-muted mb-6">Crea tu primera cuenta para comenzar</p>
-          <button @click="showCreateModal = true" class="px-5 py-3 rounded-xl font-bold text-white bg-linear-to-br from-indigo-500 via-primary to-purple-500 hover:shadow-lg hover:shadow-primary/40 hover:-translate-y-0.5 active:scale-95 transition-all duration-300">
-            + Crear primera cuenta
+        <div class="flex items-center gap-4">
+             <!-- Placeholder for filters if needed in future -->
+            <div class="hidden sm:block"></div> 
+
+          <button 
+            @click="showCreateModal = true"
+            class="px-5 py-2.5 rounded-xl bg-white text-bg-primary font-bold text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-white/10"
+          >
+            <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+              <path d="M12 5v14M5 12h14"/>
+            </svg>
+            Nueva Cuenta
           </button>
         </div>
+      </div>
 
-        <!-- Accounts Grid -->
-        <transition-group v-else name="list" tag="div" class="space-y-3 relative">
-          <AccountCard
-            v-for="(account, index) in accounts"
-            :key="account._id"
-            :account="account"
-            :style="{ transitionDelay: `${index * 50}ms` }"
-            @click="selectAccount(account)"
-            @edit="openEditModal(account)"
-            @delete="handleDeleteAccount"
-          />
-        </transition-group>
+      <!-- Quick Metrics Bar (Minimalist) -->
+      <div v-if="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+        <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
+          <div>
+            <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Balance Total</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">$ {{ formatNumber(stats.totalBalance) }}</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">💰</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
+          <div>
+            <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Cuentas</p>
+            <p class="text-2xl font-black text-white mt-1">{{ stats.totalAccounts }}</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">💳</div>
+        </div>
+        <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
+          <div>
+            <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Gastos del Mes</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">$ {{ formatNumber(stats.totalExpensesThisMonth) }}</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-rose-500/10 flex items-center justify-center text-rose-400 group-hover:scale-110 transition-transform">📉</div>
+        </div>
+         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
+          <div>
+            <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Estado</p>
+            <p class="text-2xl font-black text-white mt-1">{{ stats.totalBalance >= 0 ? 'Positivo' : 'Negativo' }}</p>
+          </div>
+          <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">📊</div>
+        </div>
+      </div>
 
-        <!-- Add Account Card (Visual) -->
-        <div
-          v-if="accounts.length > 0"
-          @click="showCreateModal = true"
-          class="mt-3 bg-white/5 border-2 border-dashed border-white/20 rounded-2xl p-6 text-center cursor-pointer hover:bg-white/10 hover:border-primary/40 transition-all duration-300 group"
-        >
-          <span class="text-2xl text-text-muted group-hover:text-primary transition-colors">+</span>
-          <p class="text-text-muted group-hover:text-primary text-sm mt-1 transition-colors">Agregar otra cuenta</p>
+      <!-- Main List Container -->
+      <div class="flex-1 min-h-0">
+         <div v-if="loading" class="flex flex-col items-center justify-center py-20 gap-4">
+          <div class="animate-spin h-10 w-10 border-4 border-white/5 border-t-primary rounded-full"></div>
+          <p class="text-text-muted font-bold text-xs uppercase tracking-widest">Cargando Finanzas...</p>
+        </div>
+
+        <div v-else class="space-y-4">
+           <!-- Empty State -->
+            <div v-if="accounts.length === 0" class="glass rounded-3xl p-20 text-center border border-white/5 space-y-6">
+                <div class="text-7xl">💳</div>
+                <div>
+                    <h3 class="text-2xl font-black text-text-primary">Sin cuentas asociadas</h3>
+                    <p class="text-text-muted mt-2">Agrega tu primera cuenta bancaria o efectivo.</p>
+                </div>
+                <button @click="showCreateModal = true" class="px-5 py-3 rounded-xl font-bold text-white bg-primary hover:bg-primary-dark transition-all">
+                    Crear primera cuenta
+                </button>
+            </div>
+
+            <!-- Accounts Grid -->
+            <TransitionGroup 
+                name="list" 
+                tag="div" 
+                class="grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+                <AccountCard
+                    v-for="(account, index) in accounts"
+                    :key="account._id"
+                    :account="account"
+                    :style="{ transitionDelay: `${index * 50}ms` }"
+                    @click="selectAccount(account)"
+                    @edit="openEditModal(account)"
+                    @delete="handleDeleteAccount"
+                />
+            </TransitionGroup>
         </div>
       </div>
     </div>
-
-    <!-- FAB Button -->
-    <button
-      v-if="!showCreateModal && !selectedAccount"
-      @click="showCreateModal = true"
-      title="Nueva cuenta"
-      class="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-linear-to-br from-primary to-purple-600 text-white cursor-pointer flex items-center justify-center shadow-lg shadow-primary/40 transition-all duration-300 hover:scale-110 hover:rotate-90 active:scale-90 z-50"
-    >
-      <svg class="w-7 h-7" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M12 5v14M5 12h14"/>
-      </svg>
-    </button>
 
     <!-- Create/Edit Account Modal -->
     <Transition name="modal">
       <div
         v-if="showCreateModal"
         @click.self="handleCancelModal"
-        class="fixed inset-0 bg-black/70 backdrop-blur-sm flex justify-center z-200 p-5 sm:items-center sm:p-5 items-end pb-0 sm:pb-5"
+        class="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-6"
       >
-        <CreateAccountModal
-          :initial-data="editingAccount"
-          @submit="editingAccount ? handleUpdateAccount($event) : handleCreateAccount($event)"
-          @cancel="handleCancelModal"
-        />
+            <CreateAccountModal
+                class="animate-pop"
+                :initial-data="editingAccount"
+                @submit="editingAccount ? handleUpdateAccount($event) : handleCreateAccount($event)"
+                @cancel="handleCancelModal"
+            />
       </div>
     </Transition>
-
-    <!-- Footer -->
-    <footer class="text-center py-6 text-text-muted text-sm">
-      <p>TaskFlow — Hecho con 💜</p>
-    </footer>
   </div>
 </template>
 
 <style scoped>
+.glass {
+  background: rgba(255, 255, 255, 0.02);
+  backdrop-filter: blur(10px);
+}
+
+/* Slide Transition for Details */
+.slide-enter-active, .slide-leave-active {
+  transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+.slide-enter-from { transform: translateX(30px); opacity: 0; }
+.slide-leave-to { transform: translateX(-30px); opacity: 0; }
+
 /* List Transitions */
 .list-move,
 .list-enter-active,
 .list-leave-active {
   transition: all 0.5s var(--ease-spring);
 }
-
 .list-enter-from,
 .list-leave-to {
   opacity: 0;
-  transform: translateX(-10px);
+  transform: scale(0.95) translateY(10px);
 }
-
 .list-leave-active {
   position: absolute;
-  width: 100%;
-}
-
-/* Modal Transitions */
-.modal-enter-active,
-.modal-leave-active {
-  transition: all 0.3s var(--ease-card);
-}
-
-.modal-enter-from,
-.modal-leave-to {
-  opacity: 0;
-}
-
-.modal-enter-from .bg-bg-secondary,
-.modal-leave-to .bg-bg-secondary {
-  transform: scale(0.95) translateY(10px);
+  width: 100%; /* For grid items this might be tricky, usually leave-active absolute works best in lists. in Grid, leave absolute might mess up layout unless handled carefully. Removing absolute for grid safety or checking. */
 }
 </style>

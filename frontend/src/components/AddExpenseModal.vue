@@ -135,84 +135,106 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="bg-bg-secondary border border-white/10 rounded-t-2xl sm:rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+  <div class="bg-[#0f172a] rounded-3xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl relative overflow-hidden border border-white/10 group">
+    <!-- Decorative Glows -->
+    <div class="absolute top-0 left-0 right-0 h-1 bg-linear-to-r from-emerald-500 via-primary to-rose-500 opacity-80"></div>
+    <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
+
     <!-- Header -->
-    <div class="flex justify-between items-center p-5 border-b border-white/10">
-      <div class="flex items-center gap-3">
-        <span class="text-2xl">🧾</span>
-        <h2 class="text-xl font-semibold">{{ initialData ? 'Editar Gasto' : 'Nuevo Gasto' }}</h2>
-      </div>
+    <div class="relative px-8 pt-8 pb-6 text-center">
+      <h2 class="text-3xl font-black text-white tracking-tight mb-1">
+        {{ initialData ? 'Editar Transacción' : 'Nueva Transacción' }}
+      </h2>
+      <p class="text-[10px] uppercase font-black tracking-[0.2em] text-cyan-400">
+        {{ initialData ? 'Modificar detalle' : 'Registrar movimiento' }}
+      </p>
+
       <button
         @click="emit('cancel')"
-        class="w-8 h-8 rounded-full bg-white/5 text-text-muted flex items-center justify-center hover:bg-danger hover:text-white transition-all"
+        class="absolute top-6 right-6 w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all transform hover:rotate-90"
       >
         ✕
       </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="p-5 space-y-5">
+    <form @submit.prevent="handleSubmit" class="px-8 pb-8 space-y-6">
       <!-- Descripción -->
-      <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">Descripción</label>
+      <div class="group/input">
+        <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Concepto</label>
         <div class="relative">
-          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">✏️</span>
-          <input
-            v-model="description"
-            type="text"
-            placeholder="Ej: Compras del supermercado"
-            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-12 pr-4 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
-            required
-          />
+            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none group-focus-within/input:text-primary transition-colors text-white/30">
+                <span class="text-lg">✏️</span>
+            </div>
+            <input
+                v-model="description"
+                type="text"
+                placeholder="Ej: Starlink Internet"
+                class="w-full bg-bg-primary border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner"
+                required
+            />
         </div>
       </div>
 
       <!-- Monto y Fecha -->
       <div class="grid grid-cols-2 gap-4">
-        <div>
-          <label class="block text-sm font-medium text-text-secondary mb-2">Monto</label>
+        <div class="group/input">
+          <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Monto</label>
           <div class="relative">
-            <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-muted">$</span>
+            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none group-focus-within/input:text-emerald-400 transition-colors text-white/30">
+                <span class="text-lg font-black">$</span>
+            </div>
             <input
               v-model.number="amount"
               type="number"
               step="0.01"
               placeholder="0.00"
-              class="w-full bg-white/5 border border-white/10 rounded-xl py-3 pl-10 pr-4 text-text-primary placeholder:text-text-muted focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+              class="w-full bg-bg-primary border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all shadow-inner"
               required
             />
           </div>
         </div>
-        <div>
-          <label class="block text-sm font-medium text-text-secondary mb-2">Fecha</label>
+        <div class="group/input">
+          <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Fecha</label>
           <input
             v-model="date"
             type="date"
-            class="w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all"
+            class="w-full bg-bg-primary border border-white/5 rounded-2xl py-4 px-4 text-white font-bold focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner scheme-dark"
           />
         </div>
       </div>
 
       <!-- Categoría -->
-      <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">Categoría</label>
-        <select
-          v-model="category"
-          class="custom-select w-full bg-white/5 border border-white/10 rounded-xl py-3 px-4 text-text-primary focus:outline-none focus:border-primary/50 focus:ring-2 focus:ring-primary/20 transition-all cursor-pointer"
-        >
-          <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
-        </select>
+      <div class="group/input">
+        <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Categoría</label>
+        <div class="relative">
+            <div class="absolute inset-y-0 left-0 flex items-center pl-4 pointer-events-none text-white/30">
+                <span class="text-lg">🏷️</span>
+            </div>
+            <select
+            v-model="category"
+            class="custom-select w-full bg-bg-primary border border-white/5 rounded-2xl py-4 pl-12 pr-10 text-white font-bold appearance-none focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner cursor-pointer"
+            >
+            <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
+            </select>
+            <!-- Custom Arrow -->
+            <div class="absolute inset-y-0 right-0 flex items-center pr-4 pointer-events-none text-white/30">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M19 9l-7 7-7-7" />
+                </svg>
+            </div>
+        </div>
       </div>
 
       <!-- Recibo / Comprobante -->
       <div>
-        <label class="block text-sm font-medium text-text-secondary mb-2">Recibo / Comprobante</label>
+        <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Comprobante</label>
         <div
           @dragover.prevent="dragOver = true"
           @dragleave="dragOver = false"
           @drop="handleDrop"
-          class="border-2 border-dashed rounded-xl p-6 text-center transition-all cursor-pointer"
-          :class="dragOver ? 'border-primary bg-primary/10' : 'border-white/20 hover:border-primary/40'"
+          class="group/drop bg-bg-primary border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer relative overflow-hidden"
+          :class="dragOver ? 'border-primary bg-primary/10' : 'border-white/10 hover:border-white/30 hover:bg-white/5'"
           @click="($refs.fileInput as HTMLInputElement).click()"
         >
           <input
@@ -224,49 +246,52 @@ const handleSubmit = async () => {
           />
 
           <!-- Preview -->
-          <div v-if="receiptFile" class="relative">
+          <div v-if="receiptFile" class="relative z-10">
             <img
               v-if="receiptPreview"
               :src="receiptPreview"
               alt="Preview"
-              class="max-h-32 mx-auto rounded-lg"
+              class="max-h-32 mx-auto rounded-lg shadow-lg"
             />
-            <div v-else class="text-4xl">📄</div>
-            <p class="text-sm text-text-muted mt-2">{{ receiptFile.name }}</p>
+            <div v-else class="text-4xl mb-2">📄</div>
+            <p class="text-sm font-bold text-white mt-2">{{ receiptFile.name }}</p>
+            <p class="text-[10px] text-emerald-400 font-bold uppercase tracking-wider mt-1">Listo para subir</p>
+
             <button
               type="button"
               @click.stop="removeFile"
-              class="absolute top-0 right-0 w-6 h-6 bg-danger text-white rounded-full text-xs hover:scale-110 transition-transform"
+              class="absolute -top-2 -right-2 w-8 h-8 bg-rose-500 text-white rounded-full flex items-center justify-center hover:bg-rose-600 shadow-lg transform hover:scale-110 transition-transform"
             >
               ✕
             </button>
           </div>
 
           <!-- Placeholder -->
-          <div v-else>
-            <div class="text-4xl text-text-muted mb-2">☁️</div>
-            <p class="text-primary text-sm font-medium">Sube una imagen</p>
-            <p class="text-text-muted text-xs">o arrastra aquí</p>
-            <p class="text-text-muted text-xs mt-2">PNG, JPG, PDF hasta 5MB</p>
+          <div v-else class="relative z-10 py-2">
+            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 group-hover/drop:scale-110 transition-transform duration-300">
+                <span class="text-2xl opacity-60">☁️</span>
+            </div>
+            <p class="text-white font-bold text-sm">Sube tu comprobante</p>
+            <p class="text-white/40 text-xs mt-1">Arrastra o haz click aquí</p>
           </div>
         </div>
       </div>
 
       <!-- Buttons -->
-      <div class="flex gap-3 pt-4">
+      <div class="flex gap-4 pt-2">
         <button
           type="button"
           @click="emit('cancel')"
-          class="flex-1 py-3 rounded-xl font-medium text-text-muted border border-white/10 hover:bg-white/5 transition-all"
+          class="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all text-center"
         >
           Cancelar
         </button>
         <button
           type="submit"
           :disabled="loading"
-          class="flex-1 py-3 rounded-xl font-bold text-white bg-linear-to-br from-indigo-500 via-primary to-purple-500 hover:shadow-lg hover:shadow-primary/40 active:scale-98 transition-all duration-300 disabled:opacity-50"
+          class="flex-2 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-linear-to-r from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          {{ loading ? 'Guardando...' : (initialData ? 'Actualizar' : 'Guardar Gasto') }}
+          {{ loading ? 'Guardando...' : (initialData ? 'Actualizar Transacción' : 'Guardar') }}
         </button>
       </div>
     </form>
@@ -274,17 +299,5 @@ const handleSubmit = async () => {
 </template>
 
 <style scoped>
-/* Fix for select dropdown options in dark mode */
-.custom-select {
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%23a0a0a0' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 12px center;
-}
-
-.custom-select option {
-  background-color: #1a1a2e;
-  color: white;
-  padding: 8px;
-}
+/* Eliminated old custom CSS in favor of utility classes */
 </style>

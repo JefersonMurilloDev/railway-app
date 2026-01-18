@@ -89,7 +89,7 @@ const handleSubmit = async () => {
           </div>
 
           <div class="space-y-2">
-            <label class="block text-sm font-medium text-text-secondary flex justify-between">
+            <label class="flex justify-between text-sm font-medium text-text-secondary">
               <span>Contraseña</span>
               <a v-if="isLoginMode" href="#" class="text-xs text-primary hover:text-primary-light transition-colors">¿Olvidaste tu contraseña?</a>
             </label>
@@ -102,7 +102,6 @@ const handleSubmit = async () => {
           </button>
         </form>
 
-        <!-- Footer -->
         <p class="mt-8 text-center text-text-muted">
           {{ isLoginMode ? '¿Aún no tienes cuenta?' : '¿Ya tienes una cuenta?' }}
           <button @click="toggleMode" type="button" class="text-primary font-bold hover:underline ml-1">
@@ -117,7 +116,7 @@ const handleSubmit = async () => {
     </div>
 
     <!-- Right Side: Decorative/Preview Section -->
-    <div class="hidden lg:flex w-[55%] relative overflow-hidden bg-gradient-to-br from-[#0B0F1A] via-[#1A1A2E] to-primary/10">
+    <div class="hidden lg:flex w-[55%] relative overflow-hidden bg-linear-to-br from-[#0B0F1A] via-[#1A1A2E] to-primary/10">
       <!-- Animated Background Blobs -->
       <div class="absolute top-[-10%] right-[-10%] w-[50%] h-[50%] bg-primary/20 blur-[120px] rounded-full animate-pulse"></div>
       <div class="absolute bottom-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-600/10 blur-[100px] rounded-full"></div>

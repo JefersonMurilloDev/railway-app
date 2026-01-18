@@ -26,6 +26,7 @@ watch(() => props.initialData, (newData) => {
 });
 
 const handleSubmit = () => {
+    if (!title.value.trim()) return;
   emit('submit', {
     title: title.value,
     description: description.value,
@@ -46,86 +47,79 @@ const minDate = new Date().toISOString().split('T')[0];
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="p-6">
-    <!-- Main inputs -->
-    <div class="flex flex-col gap-3 mb-4">
+  <form @submit.prevent="handleSubmit" class="space-y-8 animate-pop">
+    <!-- Title Input -->
+    <div class="space-y-2">
+      <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Título de la actividad</label>
       <input 
         v-model="title" 
         type="text" 
-        placeholder="¿Qué necesitas hacer hoy?" 
-        class="w-full bg-transparent border-none text-xl font-medium placeholder-white/40 focus:outline-none focus:ring-0 p-0"
+        placeholder="Ej: Diseñar Dashboard Premium" 
+        class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xl font-bold placeholder-white/20 focus:outline-none focus:border-primary/50 transition-all shadow-inner"
         required
         autofocus
       />
+    </div>
+
+    <!-- Description Input -->
+    <div class="space-y-2">
+      <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Detalles adicionales</label>
       <textarea 
         v-model="description" 
-        placeholder="Añade detalles o notas..." 
-        class="w-full bg-transparent border-none text-base placeholder-white/40 focus:outline-none focus:ring-0 resize-none min-h-[60px] p-0"
-        rows="2"
+        placeholder="Añade notas o requerimientos..." 
+        class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm text-text-secondary placeholder-white/20 focus:outline-none focus:border-primary/40 transition-all resize-none min-h-[120px]"
       ></textarea>
     </div>
     
-    <!-- Options Row -->
-    <div class="flex gap-4 flex-col sm:flex-row mb-4">
-      <!-- Due Date -->
-      <div class="flex-1 sm:min-w-[140px]">
-        <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">📅 Fecha</label>
-        <div class="relative inline-block w-full">
-          <input 
-            type="date" 
-            v-model="dueDate" 
-            class="w-full bg-white/5 border border-white/10 rounded-lg pl-3 pr-16 py-2 text-sm text-white focus:outline-none focus:border-primary transition-all cursor-pointer min-w-full sm:min-w-[150px] appearance-none"
-            :min="minDate"
-          />
+    <!-- Meta Options Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Priority -->
+      <div class="space-y-3">
+        <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Nivel de prioridad</label>
+        <div class="bg-black/20 p-1.5 rounded-2xl border border-white/5 flex gap-1">
           <button 
-            type="button" 
-            v-if="dueDate" 
-            @click="dueDate = ''" 
-            class="absolute right-9 top-1/2 -translate-y-1/2 w-5 h-5 flex items-center justify-center bg-white/10 rounded-full text-text-muted text-[10px] hover:bg-danger hover:text-white transition-all border-none cursor-pointer"
-            title="Quitar fecha"
-          >✕</button>
+            v-for="p in [{v:'low', l:'Baja', c:'text-emerald-400'}, {v:'medium', l:'Media', c:'text-amber-400'}, {v:'high', l:'Alta', c:'text-rose-400'}]" 
+            :key="p.v"
+            type="button"
+            @click="priority = p.v as any"
+            class="flex-1 py-3 rounded-xl text-[10px] font-black uppercase tracking-wider transition-all"
+            :class="priority === p.v ? 'bg-white/10 text-white border border-white/10 shadow-lg' : 'text-text-muted hover:text-text-secondary'"
+          >
+            <span class="mr-1" :class="p.c">•</span>
+            {{ p.l }}
+          </button>
         </div>
       </div>
 
-      <!-- Priority -->
-      <div class="flex-1">
-        <label class="block text-xs font-bold text-text-secondary uppercase tracking-wider mb-2">Prioridad</label>
-        <div class="flex gap-1.5 w-full">
-          <label 
-            class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer transition-all text-xs text-text-secondary hover:bg-black/30"
-            :class="{ 'bg-primary/15 border-primary text-text-primary': priority === 'low' }"
-          >
-            <input type="radio" v-model="priority" value="low" class="hidden" />
-            <span class="w-2 h-2 rounded-full bg-success shrink-0"></span>
-            <span class="hidden sm:inline">Baja</span>
-          </label>
-          <label 
-            class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer transition-all text-xs text-text-secondary hover:bg-black/30"
-            :class="{ 'bg-primary/15 border-primary text-text-primary': priority === 'medium' }"
-          >
-            <input type="radio" v-model="priority" value="medium" class="hidden" />
-            <span class="w-2 h-2 rounded-full bg-warning shrink-0"></span>
-            <span class="hidden sm:inline">Media</span>
-          </label>
-          <label 
-            class="flex-1 flex items-center justify-center gap-1.5 px-2 py-2 bg-black/20 border border-white/10 rounded-lg cursor-pointer transition-all text-xs text-text-secondary hover:bg-black/30"
-            :class="{ 'bg-primary/15 border-primary text-text-primary': priority === 'high' }"
-          >
-            <input type="radio" v-model="priority" value="high" class="hidden" />
-            <span class="w-2 h-2 rounded-full bg-danger shrink-0"></span>
-            <span class="hidden sm:inline">Alta</span>
-          </label>
+      <!-- Due Date -->
+      <div class="space-y-3">
+        <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Fecha de entrega</label>
+        <div class="relative">
+          <input 
+            type="date" 
+            v-model="dueDate" 
+            class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm text-text-primary focus:outline-none focus:border-primary/40 transition-all appearance-none cursor-pointer"
+            :min="minDate"
+          />
+          <div v-if="dueDate" @click="dueDate = ''" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-rose-400 hover:text-rose-300 cursor-pointer">✕</div>
         </div>
       </div>
     </div>
     
-    <!-- Actions -->
-    <div class="flex gap-2 justify-end mt-6">
-      <button type="button" v-if="initialData" @click="$emit('cancel')" class="bg-transparent text-text-secondary border-none hover:text-text-primary px-4 py-2 font-semibold cursor-pointer transition-colors active:scale-95">
-        Cancelar
+    <!-- Action Buttons -->
+    <div class="pt-6 flex gap-3">
+      <button 
+        type="submit" 
+        class="flex-1 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary-dark shadow-xl shadow-primary/20 hover:-translate-y-1 active:translate-y-0 transition-all uppercase tracking-widest text-xs"
+      >
+        {{ initialData ? 'Guardar Cambios' : 'Crear Tarea' }}
       </button>
-      <button type="submit" class="px-6 py-2 rounded-xl font-semibold text-white bg-linear-to-br from-indigo-500 via-primary to-purple-600 hover:shadow-lg hover:-translate-y-0.5 active:scale-95 transition-all duration-300 border-none cursor-pointer w-full sm:w-auto">
-        {{ initialData ? 'Guardar' : '+ Crear Tarea' }}
+      <button 
+        type="button" 
+        @click="$emit('cancel')" 
+        class="px-8 text-text-muted font-bold hover:text-text-primary transition-all text-xs uppercase tracking-widest"
+      >
+        Cancelar
       </button>
     </div>
   </form>
