@@ -32,10 +32,10 @@ api.interceptors.response.use(
             error.config?.url?.includes('/auth/register');
 
         if (error.response?.status === 401 && !isAuthRoute) {
-            // Token inválido o expirado - limpiar storage y recargar
+            // Token inválido o expirado - limpiar storage y redirigir a login
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_user');
-            window.location.reload();
+            window.location.href = '/login';
         }
         return Promise.reject(error);
     }
