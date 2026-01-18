@@ -101,13 +101,13 @@ const formatDate = (dateString?: string) => {
       <div class="flex items-center gap-3">
         <span 
           v-if="dueStatus && !task.completed" 
-          class="inline-flex items-center gap-1 text-[11px] font-medium"
+          class="inline-flex items-center gap-1 text-[11px] font-medium shrink-0 whitespace-nowrap"
           :class="dueStatus.class.split(' ')[1]"
         >
           {{ dueStatus.icon }} {{ dueStatus.label }}
         </span>
         
-        <span v-if="task.description" class="text-[11px] text-text-muted truncate max-w-[200px]">
+        <span v-if="task.description" class="text-[11px] text-text-muted truncate flex-1 min-w-0 block">
           {{ task.description }}
         </span>
 

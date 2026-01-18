@@ -47,7 +47,7 @@ const minDate = new Date().toISOString().split('T')[0];
 </script>
 
 <template>
-  <form @submit.prevent="handleSubmit" class="space-y-8 animate-pop">
+  <form @submit.prevent="handleSubmit" class="space-y-5 sm:space-y-8 animate-pop">
     <!-- Title Input -->
     <div class="space-y-2">
       <label class="text-[10px] uppercase font-black tracking-widest text-text-muted px-1">Título de la actividad</label>
@@ -55,7 +55,7 @@ const minDate = new Date().toISOString().split('T')[0];
         v-model="title" 
         type="text" 
         placeholder="Ej: Diseñar Dashboard Premium" 
-        class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-xl font-bold placeholder-white/20 focus:outline-none focus:border-primary/50 transition-all shadow-inner"
+        class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-lg sm:text-xl font-bold placeholder-white/20 focus:outline-none focus:border-primary/50 transition-all shadow-inner"
         required
         autofocus
       />
@@ -67,7 +67,7 @@ const minDate = new Date().toISOString().split('T')[0];
       <textarea 
         v-model="description" 
         placeholder="Añade notas o requerimientos..." 
-        class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm text-text-secondary placeholder-white/20 focus:outline-none focus:border-primary/40 transition-all resize-none min-h-[120px]"
+        class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-sm text-text-secondary placeholder-white/20 focus:outline-none focus:border-primary/40 transition-all resize-none min-h-[100px] sm:min-h-[120px]"
       ></textarea>
     </div>
     
@@ -98,10 +98,10 @@ const minDate = new Date().toISOString().split('T')[0];
           <input 
             type="date" 
             v-model="dueDate" 
-            class="w-full bg-white/5 border border-white/10 rounded-2xl px-6 py-4 text-sm text-text-primary focus:outline-none focus:border-primary/40 transition-all appearance-none cursor-pointer"
+            class="w-full bg-white/5 border border-white/10 rounded-2xl px-4 py-3 sm:px-6 sm:py-4 text-sm text-text-primary focus:outline-none focus:border-primary/40 transition-all appearance-none cursor-pointer"
             :min="minDate"
           />
-          <div v-if="dueDate" @click="dueDate = ''" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-rose-400 hover:text-rose-300 cursor-pointer">✕</div>
+          <div v-if="dueDate" @click="dueDate = ''" class="absolute right-10 top-1/2 -translate-y-1/2 p-2 text-rose-400 hover:text-rose-300 cursor-pointer">✕</div>
         </div>
       </div>
     </div>
@@ -110,7 +110,7 @@ const minDate = new Date().toISOString().split('T')[0];
     <div class="pt-6 flex gap-3">
       <button 
         type="submit" 
-        class="flex-1 bg-primary text-white font-black py-4 rounded-2xl hover:bg-primary-dark shadow-xl shadow-primary/20 hover:-translate-y-1 active:translate-y-0 transition-all uppercase tracking-widest text-xs"
+        class="flex-1 bg-primary text-white font-black py-3 sm:py-4 rounded-2xl hover:bg-primary-dark shadow-xl shadow-primary/20 hover:-translate-y-1 active:translate-y-0 transition-all uppercase tracking-widest text-xs"
       >
         {{ initialData ? 'Guardar Cambios' : 'Crear Tarea' }}
       </button>

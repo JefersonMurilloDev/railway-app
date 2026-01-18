@@ -75,7 +75,7 @@ const handleSubmit = () => {
     <div class="absolute -top-20 -right-20 w-40 h-40 bg-primary/20 blur-3xl rounded-full pointer-events-none z-0"></div>
 
     <!-- Header (Fixed) -->
-    <div class="text-center pt-8 pb-6 px-8 relative shrink-0 z-10 bg-[#0f172a]/95 backdrop-blur-sm">
+    <div class="text-center pt-6 pb-4 px-5 sm:pt-8 sm:pb-6 sm:px-8 relative shrink-0 z-10 bg-[#0f172a]/95 backdrop-blur-sm">
       <h2 class="text-2xl font-black text-white tracking-tight">
         {{ initialData ? 'Editar Cuenta' : 'Nueva Cuenta' }}
       </h2>
@@ -85,7 +85,7 @@ const handleSubmit = () => {
     </div>
 
     <!-- Scrollable Content -->
-    <div class="flex-1 overflow-y-auto custom-scrollbar relative z-10 px-8">
+    <div class="flex-1 overflow-y-auto custom-scrollbar relative z-10 px-5 sm:px-8">
       <form @submit.prevent="handleSubmit" id="account-form" class="space-y-6 py-2">
         <!-- Nombre de la cuenta -->
         <div class="space-y-2">
@@ -96,7 +96,7 @@ const handleSubmit = () => {
               v-model="name"
               type="text"
               placeholder="Ej. Ahorros Banco Principal"
-              class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-14 pr-6 text-text-primary font-bold placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all shadow-inner"
+              class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-12 pr-4 sm:py-4 sm:pl-14 sm:pr-6 text-text-primary font-bold placeholder:text-white/20 focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all shadow-inner"
               required
               autofocus
             />
@@ -113,7 +113,7 @@ const handleSubmit = () => {
               type="number"
               step="0.01"
               placeholder="0.00"
-              class="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-6 text-text-primary font-mono font-bold placeholder:text-white/20 focus:outline-none focus:border-success/50 focus:bg-white/10 transition-all shadow-inner"
+              class="w-full bg-white/5 border border-white/10 rounded-2xl py-3 pl-10 pr-4 sm:py-4 sm:pl-12 sm:pr-6 text-text-primary font-mono font-bold placeholder:text-white/20 focus:outline-none focus:border-success/50 focus:bg-white/10 transition-all shadow-inner"
             />
           </div>
         </div>
@@ -125,7 +125,7 @@ const handleSubmit = () => {
             <div class="relative">
                <select
                 v-model="type"
-                class="w-full appearance-none bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-text-primary font-medium focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all cursor-pointer"
+                class="w-full appearance-none bg-white/5 border border-white/10 rounded-2xl py-3 px-4 sm:py-4 sm:px-6 text-text-primary font-medium focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all cursor-pointer"
               >
                 <option v-for="t in accountTypes" :key="t.value" :value="t.value" class="bg-bg-primary text-white">{{ t.label }}</option>
               </select>
@@ -139,7 +139,7 @@ const handleSubmit = () => {
             <div class="relative">
               <select
                 v-model="currency"
-                class="w-full appearance-none bg-white/5 border border-white/10 rounded-2xl py-4 px-6 text-text-primary font-medium focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all cursor-pointer"
+                class="w-full appearance-none bg-white/5 border border-white/10 rounded-2xl py-3 px-4 sm:py-4 sm:px-6 text-text-primary font-medium focus:outline-none focus:border-primary/50 focus:bg-white/10 transition-all cursor-pointer"
               >
                 <option v-for="c in currencies" :key="c.value" :value="c.value" class="bg-bg-primary text-white">{{ c.label }}</option>
               </select>
@@ -171,19 +171,19 @@ const handleSubmit = () => {
     </div>
 
     <!-- Footer Buttons (Fixed) -->
-    <div class="px-8 py-6 shrink-0 z-10 bg-[#0f172a] border-t border-white/5 mt-auto">
+    <div class="px-5 py-4 sm:px-8 sm:py-6 shrink-0 z-10 bg-[#0f172a] border-t border-white/5 mt-auto">
       <div class="flex gap-3">
         <button
           type="button"
           @click="emit('cancel')"
-          class="px-6 py-4 rounded-2xl font-bold text-text-muted hover:text-white hover:bg-white/5 transition-all uppercase tracking-widest text-[10px]"
+          class="px-5 py-3 sm:px-6 sm:py-4 rounded-2xl font-bold text-text-muted hover:text-white hover:bg-white/5 transition-all uppercase tracking-widest text-[10px]"
         >
           Cancelar
         </button>
         <button
           type="submit"
           form="account-form"
-          class="flex-1 py-4 rounded-2xl font-black text-white bg-primary hover:bg-primary-hover shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-widest text-[10px]"
+          class="flex-1 py-3 sm:py-4 rounded-2xl font-black text-white bg-primary hover:bg-primary-hover shadow-xl shadow-primary/20 hover:-translate-y-0.5 active:translate-y-0 transition-all uppercase tracking-widest text-[10px]"
         >
           {{ initialData ? 'Actualizar Cuenta' : 'Crear Cuenta' }}
         </button>

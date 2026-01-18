@@ -68,19 +68,19 @@ const handleDeleteAccount = async () => {
 
       <div v-else key="app" class="relative h-full w-full flex flex-col overflow-hidden">
         <!-- Header with Navigation -->
-        <header class="flex-none flex justify-between items-center py-6 px-6 sm:px-8 mb-4 border-b border-white/5 mx-auto max-w-6xl w-full">
+        <header class="flex-none flex justify-between items-center py-4 px-4 sm:py-6 sm:px-8 mb-2 sm:mb-4 border-b border-white/5 mx-auto max-w-6xl w-full">
           <!-- Navigation Tabs -->
           <nav class="flex bg-white/5 p-1 rounded-xl border border-white/5">
             <button
               @click="currentView = 'tasks'"
-              class="px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300"
+              class="px-3 py-1.5 sm:px-5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300"
               :class="currentView === 'tasks' ? 'bg-primary text-white shadow-lg' : 'text-text-muted hover:text-text-primary'"
             >
               📋 Tareas
             </button>
             <button
               @click="currentView = 'accounts'"
-              class="px-5 py-2 rounded-lg text-xs font-bold uppercase tracking-widest transition-all duration-300"
+              class="px-3 py-1.5 sm:px-5 sm:py-2 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-widest transition-all duration-300"
               :class="currentView === 'accounts' ? 'bg-primary text-white shadow-lg' : 'text-text-muted hover:text-text-primary'"
             >
               💳 Cuentas
@@ -109,7 +109,7 @@ const handleDeleteAccount = async () => {
             <!-- Botón Cerrar Sesión -->
             <button 
               @click="logout" 
-              class="px-3 py-2 sm:px-4 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-medium text-text-secondary hover:bg-danger/10 hover:text-danger hover:border-danger/30 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-2"
+              class="p-2 sm:px-4 sm:py-2 rounded-lg bg-white/5 border border-white/10 text-sm font-medium text-text-secondary hover:bg-danger/10 hover:text-danger hover:border-danger/30 active:scale-95 transition-all duration-300 cursor-pointer flex items-center gap-2"
               title="Cerrar Sesión"
             >
               <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="sm:hidden">

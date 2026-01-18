@@ -53,9 +53,9 @@ const isPositive = props.account.currentBalance ? props.account.currentBalance >
     @click="emit('click')"
     class="group h-full bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-5 cursor-pointer transition-all duration-300 hover:bg-white/10 hover:border-primary/30 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/10"
   >
-    <div class="flex items-center justify-between">
+    <div class="flex flex-wrap sm:flex-nowrap items-center justify-between gap-4">
       <!-- Left: Icon & Info -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 min-w-0 flex-1">
         <div
           class="w-12 h-12 rounded-xl flex items-center justify-center text-2xl"
           :style="{ backgroundColor: account.color + '20', color: account.color }"
@@ -63,13 +63,13 @@ const isPositive = props.account.currentBalance ? props.account.currentBalance >
           {{ getAccountIcon(account.type) }}
         </div>
         <div>
-          <h3 class="font-semibold text-text-primary text-lg">{{ account.name }}</h3>
+          <h3 class="font-semibold text-text-primary text-lg truncate pr-2">{{ account.name }}</h3>
           <p class="text-sm text-text-muted">{{ getTypeName(account.type) }}</p>
         </div>
       </div>
 
       <!-- Right: Balance & Actions -->
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end ml-14 sm:ml-0">
         <div class="text-right">
           <p
             class="font-bold text-xl"
@@ -84,7 +84,7 @@ const isPositive = props.account.currentBalance ? props.account.currentBalance >
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div class="flex gap-2 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           <button
             @click.stop="emit('edit', account)"
             class="w-8 h-8 rounded-lg bg-white/10 border border-white/10 text-text-muted flex items-center justify-center hover:bg-primary/20 hover:text-primary hover:border-primary/30 transition-all"

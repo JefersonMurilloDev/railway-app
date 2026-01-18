@@ -121,21 +121,21 @@ onMounted(fetchData);
     </Transition>
 
     <!-- Vista Principal de Cuentas -->
-    <div v-show="!selectedAccount" class="flex-1 flex flex-col max-w-6xl mx-auto w-full px-6 py-8 pb-28 overflow-y-auto overflow-x-hidden custom-scrollbar">
+    <div v-show="!selectedAccount" class="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-6 sm:px-6 sm:py-8 pb-20 sm:pb-28 overflow-y-auto overflow-x-hidden custom-scrollbar">
       <!-- Workspace Header (Refined) -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 sm:mb-10 gap-4 sm:gap-6">
         <div>
-          <h1 class="text-4xl font-bold tracking-tight text-white mb-2">My Finance</h1>
-          <p class="text-text-muted text-sm max-w-md">Controla tus activos y cuentas bancarias.</p>
+          <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-white mb-1 sm:mb-2">My Finance</h1>
+          <p class="text-text-muted text-xs sm:text-sm max-w-md">Controla tus activos y cuentas bancarias.</p>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto justify-start sm:justify-end">
              <!-- Placeholder for filters if needed in future -->
             <div class="hidden sm:block"></div> 
 
           <button 
             @click="showCreateModal = true"
-            class="px-5 py-2.5 rounded-xl bg-white text-bg-primary font-bold text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-white/10"
+            class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-white text-bg-primary font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-white/10"
           >
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
               <path d="M12 5v14M5 12h14"/>
@@ -146,7 +146,7 @@ onMounted(fetchData);
       </div>
 
       <!-- Quick Metrics Bar (Minimalist) -->
-      <div v-if="stats" class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <div v-if="stats" class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12">
         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Balance Total</p>
@@ -157,7 +157,7 @@ onMounted(fetchData);
         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Cuentas</p>
-            <p class="text-2xl font-black text-white mt-1">{{ stats.totalAccounts }}</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">{{ stats.totalAccounts }}</p>
           </div>
           <div class="w-10 h-10 rounded-full bg-blue-500/10 flex items-center justify-center text-blue-400 group-hover:scale-110 transition-transform">💳</div>
         </div>
@@ -171,7 +171,7 @@ onMounted(fetchData);
          <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Estado</p>
-            <p class="text-2xl font-black text-white mt-1">{{ stats.totalBalance >= 0 ? 'Positivo' : 'Negativo' }}</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">{{ stats.totalBalance >= 0 ? 'Positivo' : 'Negativo' }}</p>
           </div>
           <div class="w-10 h-10 rounded-full bg-purple-500/10 flex items-center justify-center text-purple-400 group-hover:scale-110 transition-transform">📊</div>
         </div>
@@ -222,7 +222,7 @@ onMounted(fetchData);
       <div
         v-if="showCreateModal"
         @click.self="handleCancelModal"
-        class="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-6"
+        class="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 sm:p-6"
       >
             <CreateAccountModal
                 class="animate-pop"

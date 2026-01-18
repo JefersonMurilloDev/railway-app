@@ -142,8 +142,8 @@ onMounted(fetchAccounts);
 <template>
   <div class="flex-1 flex flex-col h-full bg-bg-primary/30 animate-pop">
     <!-- Action Bar (Sticky pseudo-header) -->
-    <div class="glass border-b border-white/5 px-6 py-4 flex items-center justify-between z-10">
-      <div class="flex items-center gap-4">
+    <div class="glass border-b border-white/5 px-4 py-3 sm:px-6 sm:py-4 flex items-center justify-between z-10 sticky top-0">
+      <div class="flex items-center gap-2 sm:gap-4">
         <button 
           @click="emit('back')"
           class="p-2 rounded-xl hover:bg-white/5 text-text-muted hover:text-text-primary transition-all"
@@ -153,11 +153,11 @@ onMounted(fetchAccounts);
           </svg>
         </button>
 
-        <div class="h-6 w-px bg-white/10 mx-2"></div>
+        <div class="h-6 w-px bg-white/10 mx-1 sm:mx-2"></div>
 
         <button 
           @click="emit('toggle')"
-          class="flex items-center gap-2 px-4 py-1.5 rounded-lg text-sm font-semibold transition-all border"
+          class="flex items-center gap-2 px-3 py-1.5 sm:px-4 rounded-lg text-xs sm:text-sm font-semibold transition-all border"
           :class="task.completed 
             ? 'bg-success/20 text-success border-success/30' 
             : 'hover:bg-success/10 text-emerald-400 border-emerald-500/20'"
@@ -165,7 +165,8 @@ onMounted(fetchAccounts);
           <svg v-if="task.completed" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
             <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
           </svg>
-          {{ task.completed ? 'Completada' : 'Marcar como completada' }}
+          <span class="sm:hidden">{{ task.completed ? 'Lista' : 'Completar' }}</span>
+          <span class="hidden sm:inline">{{ task.completed ? 'Completada' : 'Marcar como completada' }}</span>
         </button>
       </div>
 
@@ -174,10 +175,11 @@ onMounted(fetchAccounts);
           v-if="hasChanges"
           @click="handleSave"
           :disabled="saving"
-          class="px-4 py-1.5 rounded-lg bg-primary text-white text-sm font-bold hover:bg-primary-dark transition-all disabled:opacity-50 flex items-center gap-2"
+          class="px-3 py-1.5 sm:px-4 rounded-lg bg-primary text-white text-xs sm:text-sm font-bold hover:bg-primary-dark transition-all disabled:opacity-50 flex items-center gap-2"
         >
-          <span v-if="saving" class="animate-spin h-4 w-4 border-2 border-white/30 border-t-white rounded-full"></span>
-          {{ saving ? 'Guardando...' : 'Guardar cambios' }}
+          <span v-if="saving" class="animate-spin h-3 w-3 sm:h-4 sm:w-4 border-2 border-white/30 border-t-white rounded-full"></span>
+          <span class="sm:hidden">{{ saving ? '...' : 'Guardar' }}</span>
+          <span class="hidden sm:inline">{{ saving ? 'Guardando...' : 'Guardar cambios' }}</span>
         </button>
         
         <button 
@@ -429,6 +431,14 @@ onMounted(fetchAccounts);
                   <div class="space-y-1">
                     <label class="text-[10px] text-text-muted uppercase font-bold px-1">Presupuesto</label>
                     <input v-model.number="newAccountForm.initialBalance" type="number" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-primary focus:outline-none" />
+                  </div>
+                  <div class="space-y-1">
+                    <label class="text-[10px] text-text-muted uppercase font-bold px-1">Moneda</label>
+                    <select v-model="newAccountForm.currency" class="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2 text-sm focus:border-primary focus:outline-none appearance-none cursor-pointer">
+                      <option value="COP" class="bg-bg-primary text-white">COP ($)</option>
+                      <option value="USD" class="bg-bg-primary text-white">USD ($)</option>
+                      <option value="EUR" class="bg-bg-primary text-white">EUR (€)</option>
+                    </select>
                   </div>
                 </div>
                 <!-- Color & Type -->

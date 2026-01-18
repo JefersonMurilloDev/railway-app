@@ -144,22 +144,22 @@ onMounted(fetchTasks);
     </Transition>
 
     <!-- Vista Principal de Tareas -->
-    <div v-show="!selectedTask" class="flex-1 flex flex-col max-w-6xl mx-auto w-full px-6 py-8 pb-28 overflow-y-auto overflow-x-hidden custom-scrollbar">
+    <div v-show="!selectedTask" class="flex-1 flex flex-col max-w-6xl mx-auto w-full px-4 py-6 sm:px-6 sm:py-8 pb-20 sm:pb-28 overflow-y-auto overflow-x-hidden custom-scrollbar">
       <!-- Workspace Header (Refined) -->
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-10 gap-6">
+      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6 sm:mb-10 gap-4 sm:gap-6">
         <div>
-          <h1 class="text-4xl font-bold tracking-tight text-white mb-2">My Workspace</h1>
-          <p class="text-text-muted text-sm max-w-md">Gestiona tus prioridades y finanzas en un solo lugar.</p>
+          <h1 class="text-2xl sm:text-4xl font-bold tracking-tight text-white mb-1 sm:mb-2">My Workspace</h1>
+          <p class="text-text-muted text-xs sm:text-sm max-w-md">Gestiona tus prioridades y finanzas en un solo lugar.</p>
         </div>
 
-        <div class="flex items-center gap-4">
+        <div class="flex flex-wrap items-center gap-3 sm:gap-4 w-full sm:w-auto justify-start sm:justify-end">
           <!-- Filter Tabs (Glass style) -->
           <div class="flex bg-white/5 p-1 rounded-xl border border-white/5 backdrop-blur-md">
             <button 
               v-for="f in [{id:'all', label:'Todas'}, {id:'pending', label:'Pendientes'}, {id:'completed', label:'Hechas'}]"
               :key="f.id"
               @click="filter = f.id as any"
-              class="px-4 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider transition-all"
+              class="px-3 py-1.5 sm:px-4 rounded-lg text-[10px] sm:text-xs font-bold uppercase tracking-wider transition-all"
               :class="filter === f.id ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'text-text-muted hover:text-white'"
             >
               {{ f.label }}
@@ -168,7 +168,7 @@ onMounted(fetchTasks);
 
           <button 
             @click="showForm = true"
-            class="px-5 py-2.5 rounded-xl bg-white text-bg-primary font-bold text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-white/10"
+            class="px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl bg-white text-bg-primary font-bold text-xs sm:text-sm hover:scale-105 active:scale-95 transition-all flex items-center gap-2 shadow-lg shadow-white/10"
           >
             <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
               <path d="M12 5v14M5 12h14"/>
@@ -179,32 +179,32 @@ onMounted(fetchTasks);
       </div>
 
       <!-- Quick Metrics Bar (Minimalist) -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-12">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 mb-8 sm:mb-12">
         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Pendientes</p>
-            <p class="text-2xl font-black text-white mt-1">{{ pendingCount }}</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">{{ pendingCount }}</p>
           </div>
           <div class="w-10 h-10 rounded-full bg-amber-500/10 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">🔥</div>
         </div>
         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Completas</p>
-            <p class="text-2xl font-black text-white mt-1">{{ completedCount }}</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">{{ completedCount }}</p>
           </div>
           <div class="w-10 h-10 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">✅</div>
         </div>
         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Eficiencia</p>
-            <p class="text-2xl font-black text-white mt-1">{{ tasks.length > 0 ? Math.round((completedCount/tasks.length)*100) : 0 }}%</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">{{ tasks.length > 0 ? Math.round((completedCount/tasks.length)*100) : 0 }}%</p>
           </div>
           <div class="w-10 h-10 rounded-full bg-indigo-500/10 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">🚀</div>
         </div>
         <div class="glass-card p-4 rounded-2xl flex items-center justify-between group hover:border-white/20 transition-all">
           <div>
             <p class="text-[10px] font-bold text-text-muted uppercase tracking-widest">Total</p>
-            <p class="text-2xl font-black text-white mt-1">{{ tasks.length }}</p>
+            <p class="text-xl sm:text-2xl font-black text-white mt-1">{{ tasks.length }}</p>
           </div>
           <div class="w-10 h-10 rounded-full bg-pink-500/10 flex items-center justify-center text-pink-400 group-hover:scale-110 transition-transform">📋</div>
         </div>
@@ -251,14 +251,14 @@ onMounted(fetchTasks);
       <div 
         v-if="showForm" 
         @click.self="handleCancel"
-        class="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-6"
+        class="fixed inset-0 bg-black/60 backdrop-blur-md flex justify-center items-center z-50 p-4 sm:p-6"
       >
-        <div class="bg-bg-secondary w-full max-w-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-pop">
-          <div class="flex justify-between items-center px-8 py-6 border-b border-white/5">
-            <h2 class="text-2xl font-black m-0 tracking-tighter">{{ editingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
+        <div class="bg-bg-secondary w-full max-w-xl rounded-3xl border border-white/10 shadow-2xl overflow-hidden animate-pop mx-4 sm:mx-0">
+          <div class="flex justify-between items-center px-5 py-4 sm:px-8 sm:py-6 border-b border-white/5">
+            <h2 class="text-xl sm:text-2xl font-black m-0 tracking-tighter">{{ editingTask ? 'Editar Tarea' : 'Nueva Tarea' }}</h2>
             <button @click="handleCancel" class="w-8 h-8 rounded-full hover:bg-rose-500/20 hover:text-rose-400 text-text-muted flex items-center justify-center transition-all">✕</button>
           </div>
-          <div class="p-8">
+          <div class="p-5 sm:p-8">
             <TaskForm 
               :initial-data="editingTask" 
               @submit="editingTask ? handleUpdate($event) : handleCreate($event)"

@@ -55,10 +55,17 @@ const handleSubmit = async () => {
 </script>
 
 <template>
-  <div class="min-h-screen flex flex-col lg:flex-row bg-[#0B0F1A]">
+  <div class="min-h-dvh flex flex-col lg:flex-row bg-[#0B0F1A]">
     <!-- Left Side: Form Section -->
-    <div class="w-full lg:w-[45%] flex items-center justify-center p-6 lg:p-12 bg-white/5 backdrop-blur-3xl z-10">
-      <div class="w-full max-w-md animate-pop">
+    <div class="relative w-full lg:w-[45%] flex flex-col justify-between p-6 sm:p-8 lg:p-12 bg-white/5 backdrop-blur-3xl z-10 min-h-dvh lg:min-h-0">
+      
+      <!-- Mobile Background Blobs (Slightly visible for aesthetics) -->
+      <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none lg:hidden">
+         <div class="absolute -top-[10%] -left-[10%] w-[50%] h-[40%] bg-primary/10 blur-[80px] rounded-full"></div>
+         <div class="absolute top-[40%] right-[-10%] w-[40%] h-[30%] bg-indigo-600/10 blur-[60px] rounded-full"></div>
+      </div>
+      <!-- Main Content Container (Centered vertically) -->
+      <div class="flex-1 flex flex-col justify-center w-full max-w-md mx-auto animate-pop relative z-10">
         <!-- Logo/Header -->
         <div class="text-center lg:text-left mb-10">
           <div class="inline-flex items-center justify-center w-12 h-12 rounded-2xl bg-primary/20 text-primary mb-6 border border-primary/30">
@@ -80,12 +87,12 @@ const handleSubmit = async () => {
 
           <div v-if="!isLoginMode" class="space-y-2">
             <label class="block text-sm font-medium text-text-secondary">Nombre Completo</label>
-            <input v-model="form.name" type="text" placeholder="John Doe" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-primary focus:bg-primary/5 transition-all outline-none" />
+            <input v-model="form.name" type="text" placeholder="John Doe" required class="w-full px-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm sm:text-base focus:border-primary focus:bg-primary/5 transition-all outline-none" />
           </div>
 
           <div class="space-y-2">
             <label class="block text-sm font-medium text-text-secondary">Correo Electrónico</label>
-            <input v-model="form.email" type="email" placeholder="nombre@ejemplo.com" required class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-primary focus:bg-primary/5 transition-all outline-none" />
+            <input v-model="form.email" type="email" placeholder="nombre@ejemplo.com" required class="w-full px-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm sm:text-base focus:border-primary focus:bg-primary/5 transition-all outline-none" />
           </div>
 
           <div class="space-y-2">
@@ -93,10 +100,10 @@ const handleSubmit = async () => {
               <span>Contraseña</span>
               <a v-if="isLoginMode" href="#" class="text-xs text-primary hover:text-primary-light transition-colors">¿Olvidaste tu contraseña?</a>
             </label>
-            <input v-model="form.password" type="password" placeholder="••••••••" required minlength="6" class="w-full px-4 py-3 bg-white/5 border border-white/10 rounded-xl text-white focus:border-primary focus:bg-primary/5 transition-all outline-none" />
+            <input v-model="form.password" type="password" placeholder="••••••••" required minlength="6" class="w-full px-4 py-2.5 sm:py-3 bg-white/5 border border-white/10 rounded-xl text-white text-sm sm:text-base focus:border-primary focus:bg-primary/5 transition-all outline-none" />
           </div>
 
-          <button type="submit" :disabled="loading" class="w-full py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 text-lg">
+          <button type="submit" :disabled="loading" class="w-full py-3 sm:py-4 rounded-xl bg-primary text-white font-bold hover:bg-primary-dark hover:shadow-lg hover:shadow-primary/30 transition-all duration-300 disabled:opacity-50 flex items-center justify-center gap-3 text-base sm:text-lg">
             <span v-if="loading" class="animate-spin h-5 w-5 border-3 border-white/30 border-t-white rounded-full"></span>
             {{ loading ? 'Trabajando...' : (isLoginMode ? 'Iniciar Sesión' : 'Registrarse') }}
           </button>
@@ -109,7 +116,11 @@ const handleSubmit = async () => {
           </button>
         </p>
 
-        <p class="mt-12 text-center text-xs text-text-muted/50">
+      </div>
+
+      <!-- Footer (Fixed at bottom of container) -->
+      <div class="mt-8 sm:mt-0 py-4 text-center relative z-10">
+        <p class="text-xs text-text-muted/50">
           © 2026 TaskFlow Inc. Todos los derechos reservados.
         </p>
       </div>
