@@ -66,17 +66,43 @@ html {
   font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  /* Mobile viewport fix */
+  height: 100%;
+  overflow-x: hidden;
 }
 
 body {
   margin: 0;
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
   background: linear-gradient(135deg, var(--color-bg-primary) 0%, var(--color-bg-secondary) 50%, var(--color-bg-tertiary) 100%);
   color: var(--color-text-primary);
+  /* Mobile scroll fixes */
+  overflow-x: hidden;
+  overscroll-behavior-y: contain;
+  -webkit-overflow-scrolling: touch;
 }
 
 #app {
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport height for mobile */
+  display: flex;
+  flex-direction: column;
+}
+
+/* Prevent pull-to-refresh and elastic scrolling on iOS */
+@supports (-webkit-touch-callout: none) {
+  body {
+    overscroll-behavior: none;
+  }
+}
+
+/* Fix for fixed positioned elements on mobile */
+@media (max-width: 640px) {
+  .fixed {
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+  }
 }
 
 /* Utility for Gradient Text (hard to do purely with config, keeping as utility class or could use tailwind utilities directly in components) */

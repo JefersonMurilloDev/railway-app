@@ -3,10 +3,12 @@ import { ref, onMounted, computed, watch } from 'vue';
 import api, { type Task } from '../services/api';
 import TaskForm from './TaskForm.vue';
 import TaskItem from './TaskItem.vue';
+import TaskDetailsView from './TaskDetailsView.vue';
 
 const tasks = ref<Task[]>([]);
 const loading = ref(true);
 const editingTask = ref<Task | null>(null);
+const selectedTask = ref<Task | null>(null);
 const filter = ref<'all' | 'pending' | 'completed'>('all');
 const showForm = ref(false);
 
@@ -63,11 +65,28 @@ const handleUpdate = async (taskData: any) => {
   }
 };
 
+// Actualizar desde TaskDetailsView
+const handleUpdateFromDetails = async (taskData: Partial<Task>) => {
+  if (!selectedTask.value?._id) return;
+  try {
+    const { data } = await api.put(`/tasks/${selectedTask.value._id}`, taskData);
+    const index = tasks.value.findIndex(t => t._id === data._id);
+    if (index !== -1) tasks.value[index] = data;
+    selectedTask.value = data;
+  } catch (error) {
+    console.error('Error updating task', error);
+  }
+};
+
 const handleToggle = async (task: Task) => {
   try {
     const { data } = await api.patch(`/tasks/${task._id}/toggle`);
     const index = tasks.value.findIndex(t => t._id === data._id);
     if (index !== -1) tasks.value[index] = data;
+    // Si estamos en la vista de detalle, actualizar también
+    if (selectedTask.value?._id === data._id) {
+      selectedTask.value = data;
+    }
   } catch (error) {
     console.error('Error toggling task', error);
   }
@@ -78,6 +97,10 @@ const handleDelete = async (id: string) => {
   try {
     await api.delete(`/tasks/${id}`);
     tasks.value = tasks.value.filter(t => t._id !== id);
+    // Si estábamos viendo esta tarea, volver a la lista
+    if (selectedTask.value?._id === id) {
+      selectedTask.value = null;
+    }
   } catch (error) {
     console.error('Error deleting task', error);
   }
@@ -88,12 +111,33 @@ const handleCancel = () => {
   editingTask.value = null;
 };
 
+// Abrir vista de detalles al hacer clic en una tarea
+const openTaskDetails = (task: Task) => {
+  selectedTask.value = task;
+};
+
+// Volver a la lista de tareas
+const backToList = () => {
+  selectedTask.value = null;
+};
+
 onMounted(fetchTasks);
 </script>
 
 <template>
   <div class="flex-1 flex flex-col w-full">
-    <div class="flex-1 max-w-4xl mx-auto w-full px-4 py-8 pb-28">
+    <!-- Vista de Detalles de Tarea -->
+    <TaskDetailsView
+      v-if="selectedTask"
+      :task="selectedTask"
+      @update="handleUpdateFromDetails"
+      @back="backToList"
+      @toggle="handleToggle(selectedTask!)"
+      @delete="handleDelete(selectedTask!._id!)"
+    />
+
+    <!-- Vista Principal de Tareas -->
+    <div v-else class="flex-1 max-w-4xl mx-auto w-full px-4 py-8 pb-28">
       <!-- Header -->
       <header class="text-center mb-8">
         <h1 class="text-4xl md:text-5xl font-bold bg-linear-to-br from-indigo-500 via-primary to-purple-500 bg-clip-text text-transparent mb-2">TaskFlow</h1>
@@ -161,8 +205,9 @@ onMounted(fetchTasks);
             :task="task"
             :style="{ transitionDelay: `${index * 50}ms` }"
             @toggle="handleToggle"
-            @edit="editingTask = task"
+            @edit="openTaskDetails(task)"
             @delete="handleDelete"
+            @click="openTaskDetails(task)"
           />
         </transition-group>
       </div>
@@ -170,7 +215,7 @@ onMounted(fetchTasks);
     
     <!-- FAB Button -->
     <button 
-      v-if="!showForm && tasks.length > 0"
+      v-if="!showForm && !selectedTask && tasks.length > 0"
       @click="showForm = true"
       title="Nueva tarea"
       class="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-linear-to-br from-primary to-purple-600 text-white cursor-pointer flex items-center justify-center shadow-lg shadow-primary/40 transition-all duration-300 hover:scale-110 hover:rotate-90 active:scale-90 z-50"

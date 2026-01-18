@@ -7,6 +7,7 @@ export interface ITask extends Document {
     priority: 'low' | 'medium' | 'high';
     dueDate?: Date;
     userId: mongoose.Types.ObjectId;
+    accountId?: mongoose.Types.ObjectId; // Referencia opcional a una cuenta financiera
     createdAt: Date;
     updatedAt: Date;
 }
@@ -41,6 +42,12 @@ const taskSchema = new Schema<ITask>(
             type: Schema.Types.ObjectId,
             ref: 'User',
             required: [true, 'El usuario es requerido'],
+            index: true
+        },
+        accountId: {
+            type: Schema.Types.ObjectId,
+            ref: 'Account',
+            default: null,
             index: true
         },
     },

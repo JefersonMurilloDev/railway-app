@@ -76,3 +76,9 @@ export const getMe = async (): Promise<User> => {
     const response = await api.get<{ status: string; user: User }>('/auth/me');
     return response.data.user;
 };
+
+// Eliminar cuenta y todos los datos asociados
+export const deleteAccount = async (): Promise<void> => {
+    await api.delete('/auth/me');
+    clearAuth();
+};

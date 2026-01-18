@@ -30,12 +30,13 @@ export const getTaskById = async (req: Request, res: Response, next: NextFunctio
  * Crear una nueva tarea asociada al usuario
  */
 export const createTask = async (req: Request, res: Response): Promise<void> => {
-    const { title, description, priority, dueDate } = req.body;
+    const { title, description, priority, dueDate, accountId } = req.body;
     const task = new Task({
         title,
         description,
         priority,
         dueDate,
+        accountId: accountId || null,
         userId: req.user!._id
     });
     await task.save();
@@ -47,11 +48,11 @@ export const createTask = async (req: Request, res: Response): Promise<void> => 
  * Actualizar una tarea (solo si pertenece al usuario)
  */
 export const updateTask = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
-    const { title, description, completed, priority, dueDate } = req.body;
+    const { title, description, completed, priority, dueDate, accountId } = req.body;
 
     const task = await Task.findOneAndUpdate(
         { _id: req.params.id, userId: req.user!._id },
-        { title, description, completed, priority, dueDate },
+        { title, description, completed, priority, dueDate, accountId: accountId !== undefined ? accountId : undefined },
         { new: true, runValidators: true }
     );
 

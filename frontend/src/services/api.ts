@@ -27,11 +27,14 @@ api.interceptors.request.use(
 api.interceptors.response.use(
     (response) => response,
     (error) => {
-        if (error.response?.status === 401) {
-            // Token inválido o expirado - limpiar storage
+        // Solo recargar si es 401 de token expirado, NO de login fallido
+        const isAuthRoute = error.config?.url?.includes('/auth/login') ||
+            error.config?.url?.includes('/auth/register');
+
+        if (error.response?.status === 401 && !isAuthRoute) {
+            // Token inválido o expirado - limpiar storage y recargar
             localStorage.removeItem('auth_token');
             localStorage.removeItem('auth_user');
-            // Recargar para ir a login
             window.location.reload();
         }
         return Promise.reject(error);
@@ -45,6 +48,7 @@ export interface Task {
     completed: boolean;
     priority: 'low' | 'medium' | 'high';
     dueDate?: string;
+    accountId?: string;
     createdAt?: string;
     updatedAt?: string;
 }

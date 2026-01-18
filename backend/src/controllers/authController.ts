@@ -1,5 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
 import { User } from '../models/User.js';
+import { Task } from '../models/Task.js';
+import { Account } from '../models/Account.js';
+import { Expense } from '../models/Expense.js';
 import { generateToken } from '../utils/jwt.js';
 import { AppErrorClass } from '../middleware/errorHandler.js';
 
@@ -80,5 +83,31 @@ export const getMe = async (req: Request, res: Response): Promise<void> => {
     res.json({
         status: 'success',
         user: req.user
+    });
+};
+
+/**
+ * DELETE /api/auth/me
+ * Eliminar cuenta del usuario y todos sus datos asociados (cascada)
+ */
+export const deleteAccount = async (req: Request, res: Response): Promise<void> => {
+    const userId = req.user!._id;
+
+    // Borrado en cascada: eliminar todos los datos del usuario
+    // 1. Eliminar todos los gastos
+    await Expense.deleteMany({ userId });
+
+    // 2. Eliminar todas las cuentas
+    await Account.deleteMany({ userId });
+
+    // 3. Eliminar todas las tareas
+    await Task.deleteMany({ userId });
+
+    // 4. Eliminar el usuario
+    await User.findByIdAndDelete(userId);
+
+    res.json({
+        status: 'success',
+        message: 'Cuenta eliminada correctamente junto con todos los datos asociados'
     });
 };
