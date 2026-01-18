@@ -8,7 +8,10 @@
     "build": "vue-tsc --noEmit && vite build",
     "type-check": "vue-tsc --noEmit",
     "preview": "vite preview",
-    "start": "npx serve -s dist -l ${PORT:-3000}"
+    "start": "npx serve -s dist -l ${PORT:-3000}",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.18",
@@ -20,9 +23,13 @@
   "devDependencies": {
     "@types/node": "^24.10.1",
     "@vitejs/plugin-vue": "^6.0.1",
+    "@vitest/coverage-v8": "^4.0.17",
+    "@vue/test-utils": "^2.4.6",
     "@vue/tsconfig": "^0.8.1",
+    "jsdom": "^27.4.0",
     "typescript": "~5.9.3",
     "vite": "^7.2.4",
+    "vitest": "^4.0.17",
     "vue-tsc": "^3.1.4"
   }
 }
