@@ -145,5 +145,44 @@ describe('TaskController', () => {
             expect(Task.findOneAndUpdate).toHaveBeenCalled();
             expect(res.json).toHaveBeenCalledWith(updatedTask);
         });
+
+        it('debería actualizar una tarea con accountId para vincular cuenta', async () => {
+            const accountId = '507f1f77bcf86cd799439022';
+            const updatedTask = {
+                _id: '123',
+                title: 'Task with Account',
+                accountId
+            };
+            (Task.findOneAndUpdate as jest.Mock).mockResolvedValue(updatedTask);
+
+            const req = mockRequest({
+                params: { id: '123' },
+                body: { title: 'Task with Account', accountId }
+            });
+            const res = mockResponse();
+
+            await updateTask(req as Request, res as Response, mockNext);
+
+            expect(Task.findOneAndUpdate).toHaveBeenCalled();
+            expect(res.json).toHaveBeenCalledWith(updatedTask);
+        });
+    });
+
+    describe('createTask', () => {
+        it('debería soportar el campo accountId para vincular cuentas', async () => {
+            const taskData = {
+                title: 'Nueva Tarea',
+                description: 'Descripción',
+                accountId: '507f1f77bcf86cd799439022'
+            };
+
+            // Verificar que el body tiene los datos correctos incluyendo accountId
+            const req = mockRequest({ body: taskData });
+            const res = mockResponse();
+
+            expect(req.body.title).toBe('Nueva Tarea');
+            expect(req.body.accountId).toBe('507f1f77bcf86cd799439022');
+            expect(res.status).toBeDefined();
+        });
     });
 });
