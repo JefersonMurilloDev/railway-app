@@ -11,6 +11,7 @@ mongo/
 .env
 .env.local
 .env.*.local
+.agent/
 
 # IDE
 .vscode/
