@@ -141,8 +141,8 @@ const handleSubmit = async () => {
     <div class="absolute -top-24 -right-24 w-48 h-48 bg-primary/20 rounded-full blur-3xl pointer-events-none"></div>
 
     <!-- Header -->
-    <div class="relative px-8 pt-8 pb-6 text-center">
-      <h2 class="text-3xl font-black text-white tracking-tight mb-1">
+    <div class="relative px-4 pt-6 pb-4 sm:px-8 sm:pt-8 sm:pb-6 text-center">
+      <h2 class="text-2xl sm:text-3xl font-black text-white tracking-tight mb-1">
         {{ initialData ? 'Editar Transacción' : 'Nueva Transacción' }}
       </h2>
       <p class="text-[10px] uppercase font-black tracking-[0.2em] text-cyan-400">
@@ -151,14 +151,14 @@ const handleSubmit = async () => {
 
       <button
         @click="emit('cancel')"
-        class="absolute top-6 right-6 w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all transform hover:rotate-90"
+        class="absolute top-4 right-4 sm:top-6 sm:right-6 w-8 h-8 rounded-xl bg-white/5 flex items-center justify-center text-white/50 hover:bg-white/10 hover:text-white transition-all transform hover:rotate-90"
       >
         ✕
       </button>
     </div>
 
     <!-- Form -->
-    <form @submit.prevent="handleSubmit" class="px-8 pb-8 space-y-6">
+    <form @submit.prevent="handleSubmit" class="px-4 pb-6 sm:px-8 sm:pb-8 space-y-4 sm:space-y-6">
       <!-- Descripción -->
       <div class="group/input">
         <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Concepto</label>
@@ -170,14 +170,14 @@ const handleSubmit = async () => {
                 v-model="description"
                 type="text"
                 placeholder="Ej: Starlink Internet"
-                class="w-full bg-bg-primary border border-white/5 rounded-2xl py-4 pl-12 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner"
+                class="w-full bg-bg-primary border border-white/5 rounded-2xl py-3 pl-12 pr-4 sm:py-4 sm:pl-12 sm:pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner"
                 required
             />
         </div>
       </div>
 
       <!-- Monto y Fecha -->
-      <div class="grid grid-cols-2 gap-4">
+      <div class="grid grid-cols-2 gap-3 sm:gap-4">
         <div class="group/input">
           <label class="block text-[10px] uppercase font-black tracking-widest text-text-muted mb-2 ml-1">Monto</label>
           <div class="relative">
@@ -189,7 +189,7 @@ const handleSubmit = async () => {
               type="number"
               step="0.01"
               placeholder="0.00"
-              class="w-full bg-bg-primary border border-white/5 rounded-2xl py-4 pl-10 pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all shadow-inner"
+              class="w-full bg-bg-primary border border-white/5 rounded-2xl py-3 pl-10 pr-4 sm:py-4 sm:pl-10 sm:pr-4 text-white font-bold placeholder:text-white/20 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/50 transition-all shadow-inner"
               required
             />
           </div>
@@ -199,7 +199,7 @@ const handleSubmit = async () => {
           <input
             v-model="date"
             type="date"
-            class="w-full bg-bg-primary border border-white/5 rounded-2xl py-4 px-4 text-white font-bold focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner scheme-dark"
+            class="w-full bg-bg-primary border border-white/5 rounded-2xl py-3 px-3 sm:py-4 sm:px-4 text-white font-bold focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner scheme-dark text-xs sm:text-base"
           />
         </div>
       </div>
@@ -213,7 +213,7 @@ const handleSubmit = async () => {
             </div>
             <select
             v-model="category"
-            class="custom-select w-full bg-bg-primary border border-white/5 rounded-2xl py-4 pl-12 pr-10 text-white font-bold appearance-none focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner cursor-pointer"
+            class="custom-select w-full bg-bg-primary border border-white/5 rounded-2xl py-3 pl-12 pr-10 sm:py-4 sm:pl-12 sm:pr-10 text-white font-bold appearance-none focus:outline-none focus:border-cyan-500/50 focus:ring-1 focus:ring-cyan-500/50 transition-all shadow-inner cursor-pointer"
             >
             <option v-for="cat in categories" :key="cat" :value="cat">{{ cat }}</option>
             </select>
@@ -233,7 +233,7 @@ const handleSubmit = async () => {
           @dragover.prevent="dragOver = true"
           @dragleave="dragOver = false"
           @drop="handleDrop"
-          class="group/drop bg-bg-primary border-2 border-dashed rounded-2xl p-6 text-center transition-all cursor-pointer relative overflow-hidden"
+          class="group/drop bg-bg-primary border-2 border-dashed rounded-2xl p-4 sm:p-6 text-center transition-all cursor-pointer relative overflow-hidden"
           :class="dragOver ? 'border-primary bg-primary/10' : 'border-white/10 hover:border-white/30 hover:bg-white/5'"
           @click="($refs.fileInput as HTMLInputElement).click()"
         >
@@ -251,7 +251,7 @@ const handleSubmit = async () => {
               v-if="receiptPreview"
               :src="receiptPreview"
               alt="Preview"
-              class="max-h-32 mx-auto rounded-lg shadow-lg"
+              class="max-h-24 sm:max-h-32 mx-auto rounded-lg shadow-lg"
             />
             <div v-else class="text-4xl mb-2">📄</div>
             <p class="text-sm font-bold text-white mt-2">{{ receiptFile.name }}</p>
@@ -268,11 +268,11 @@ const handleSubmit = async () => {
 
           <!-- Placeholder -->
           <div v-else class="relative z-10 py-2">
-            <div class="w-12 h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-3 group-hover/drop:scale-110 transition-transform duration-300">
-                <span class="text-2xl opacity-60">☁️</span>
+            <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-white/5 flex items-center justify-center mx-auto mb-2 sm:mb-3 group-hover/drop:scale-110 transition-transform duration-300">
+                <span class="text-xl sm:text-2xl opacity-60">☁️</span>
             </div>
             <p class="text-white font-bold text-sm">Sube tu comprobante</p>
-            <p class="text-white/40 text-xs mt-1">Arrastra o haz click aquí</p>
+            <p class="text-white/40 text-[10px] sm:text-xs mt-1">Arrastra o haz click aquí</p>
           </div>
         </div>
       </div>
@@ -282,14 +282,14 @@ const handleSubmit = async () => {
         <button
           type="button"
           @click="emit('cancel')"
-          class="flex-1 py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all text-center"
+          class="flex-1 py-3 sm:py-4 rounded-xl font-bold text-xs uppercase tracking-widest text-white/40 hover:text-white hover:bg-white/5 transition-all text-center"
         >
           Cancelar
         </button>
         <button
           type="submit"
           :disabled="loading"
-          class="flex-2 py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-linear-to-r from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="flex-2 py-3 sm:py-4 rounded-2xl font-black text-xs uppercase tracking-widest text-white bg-linear-to-r from-emerald-500 to-cyan-500 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/40 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {{ loading ? 'Guardando...' : (initialData ? 'Actualizar Transacción' : 'Guardar') }}
         </button>

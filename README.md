@@ -1,109 +1,91 @@
-# Task Manager API 🚀
+# TaskFlow - Full Stack Application 🚀
 
-API REST para gestión de tareas construida con Express, TypeScript y MongoDB. Desplegada en Railway.
+Aplicación completa para gestión de tareas y finanzas personales. Construida con un stack moderno y escalable.
+
+## 🌟 Características Principales
+
+- **Gestión de Tareas:** Crear, editar, organizar y completar tareas con prioridades.
+- **Finanzas Personales:** Registro de cuentas y transacciones (gastos) con soporte para múltiples monedas (USD, COP, EUR).
+- **Diseño Responsive:** Interfaz moderna y adaptativa optimizada para móviles y escritorio.
+- **Modo Oscuro:** Estética premium "Dark Glassmorphism".
 
 ## 🌐 URLs
 
 | Entorno | URL |
 |---------|-----|
 | **Producción** | https://cheerful-respect-production.up.railway.app/ |
-| **Local** | http://localhost:3000 |
+| **Local** | http://localhost:5173 (Frontend) |
 
-## Stack Tecnológico
+## 🛠 Stack Tecnológico
 
+### Frontend
+- **Framework:** Vue 3 (Composition API)
+- **Lenguaje:** TypeScript
+- **Estilos:** Tailwind CSS 4
+- **Build Tool:** Vite
+
+### Backend
 - **Runtime:** Node.js 18+
 - **Framework:** Express
 - **Lenguaje:** TypeScript
 - **Base de datos:** MongoDB
 - **Despliegue:** Railway
 
-## Desarrollo Local
+## � Instalación y Uso
 
-### Requisitos
+Sigue estos pasos para clonar y ejecutar el proyecto localmente.
+
+### Prerrequisitos
 - Node.js 18+
-- Docker Desktop
+- Docker (Opcional, si quieres ejecutar la base de datos localmente)
 
-### Configuración
-
-1. **Clonar e instalar**
+### 1. Clonar el repositorio
 ```bash
 git clone https://github.com/JefersonMurilloDev/railway-app.git
 cd railway-app
 ```
 
-2. **Configurar variables de entorno**
-
-Crear `.env` en la raíz:
-```env
-MONGO_USER=tu_usuario
-MONGO_PASS=tu_password
-MONGO_DB_NAME=taskmanager
-```
-
-Crear `backend/.env`:
-```env
-PORT=3000
-MONGO_URL=mongodb://tu_usuario:tu_password@localhost:27017
-MONGO_DB_NAME=taskmanager?authSource=admin
-NODE_ENV=development
-```
-
-3. **Levantar MongoDB con Docker**
-```bash
-docker-compose up -d
-```
-
-4. **Iniciar el servidor**
+### 2. Configuración Backend
 ```bash
 cd backend
 npm install
+```
+
+Crea un archivo `.env` en la carpeta `backend/` con las siguientes variables:
+```env
+PORT=3000
+MONGO_URL=mongodb://localhost:27017/taskmanager  # O tu URL de MongoDB Atlas
+```
+
+Para iniciar el servidor:
+```bash
 npm run dev
 ```
 
-## API Endpoints
-
-| Método | Ruta | Descripción |
-|--------|------|-------------|
-| GET | `/api/tasks` | Listar todas las tareas |
-| GET | `/api/tasks/:id` | Obtener una tarea |
-| POST | `/api/tasks` | Crear nueva tarea |
-| PUT | `/api/tasks/:id` | Actualizar tarea |
-| DELETE | `/api/tasks/:id` | Eliminar tarea |
-| PATCH | `/api/tasks/:id/toggle` | Alternar completado |
-| GET | `/health` | Health check |
-
-## Ejemplo de Task
-
-```json
-{
-  "title": "Mi tarea",
-  "description": "Descripción opcional",
-  "priority": "high",
-  "completed": false
-}
-```
-
-**Prioridades válidas:** `low`, `medium`, `high`
-
-## Despliegue
-
-Cada push a `main` despliega automáticamente en Railway:
-
+### 3. Configuración Frontend
+Abre una nueva terminal en la raíz del proyecto y ve a la carpeta del frontend:
 ```bash
-git add .
-git commit -m "feat: nueva funcionalidad"
-git push
+cd frontend
+npm install
 ```
 
-## Scripts
+Para iniciar la aplicación:
+```bash
+npm run dev
+```
 
-| Script | Descripción |
-|--------|-------------|
-| `npm run dev` | Servidor de desarrollo con hot reload |
-| `npm run build` | Compilar TypeScript |
-| `npm start` | Iniciar servidor de producción |
-| `npm run lint` | Ejecutar ESLint |
+¡Listo! La aplicación debería estar corriendo en `http://localhost:5173`.
 
-## Licencia
+## �👨‍💻 Autor
 
-MIT
+Desarrollado con ❤️ por **Jeferson Murillo**.
+
+- **GitHub:** [@JefersonMurilloDev](https://github.com/JefersonMurilloDev)
+- **Contacto:** [murillopalacioj@gmail.com](mailto:murillopalacioj@gmail.com)
+
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia **MIT**.
+Esto significa que es **software libre** y cualquiera puede utilizarlo, modificarlo y distribuirlo, siempre y cuando se reconozca la autoría original de **Jeferson Murillo**.
+
+Consultar el archivo `LICENSE` para más detalles.
